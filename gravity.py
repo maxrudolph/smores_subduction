@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 
 #%% physical constants
 G = 6.67430e-11 # Universal constant of gravitation, in N*m^2/kg^2
+g0 =  9.80665 
 
 #%% Load data
 mesh_file = 'output_boxslab_topcrust_h5/solution/mesh-00000.h5'
@@ -59,8 +60,14 @@ dgamma = (crho-rho_ref)*dA # mass anomaly per unit distance in/out of plane
 
 dg = 2.*G*dgamma[:,None]*(dy/(dx**2+dy**2)).T # dg is (number of cells)x(number of observation points)
 dg_interior = np.sum(dg,axis=0)
+# calculate the geoid anomaly dN
+dN_interior = np.sum(-G*dgamma/g0*np.log(dx**2 + dy**2),axis=1)
+
 # use the Bouguer gravity formula to calculate influence of surface.
 dg_surf = 2.*np.pi*G*rho[ind_surf].flatten()*topo[ind_surf].flatten()
+#%% calculate the geoid anomaly associated with surface topography.
+# Assume that excess mass is concentrated in a layer just below the surface.
+depth
 
 #%% Calculate gravity anomalies associated with bottom topography
 # because the burial depth of the CMB is great, we cannot use the bouguer formula.
@@ -98,15 +105,11 @@ plt.plot(x_botm,2*np.pi*G*(rho_core-rho_botm)*topo_botm,label='bouguer formula')
 plt.legend()
 plt.show()
 
-#%% Calculate and plot the total geoid anomaly
-
-
-
 #%%
 plt.figure()
 plt.plot(obs_x.flatten()/1e3,dg_interior,label='internal')
-#plt.plot(obs_x/1e3,dg_surf,label='surface')
-#plt.plot(obs_x/1e3,dg_botm,label='bottom')
+plt.plot(obs_x/1e3,dg_surf,label='surface')
+plt.plot(obs_x/1e3,dg_botm,label='bottom')
 plt.legend()
 plt.ylabel('Gravity anomaly (m/s$^2$)')
 plt.xlabel('Position (km)')
