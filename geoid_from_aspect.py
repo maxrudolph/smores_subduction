@@ -16,6 +16,15 @@ import h5py as h5
 import scipy.interpolate as interp
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+import sys
+
+#%% parse command-linne arguments
+# usage of this program: ./groid_from_aspect.py solution_foldergraphics_name
+# graphics_name is the filename for graphics, not including the file extension (.svg)
+if len(sys.argv) < 3: 
+    raise SystemExit("Usage: ./geoid_from_aspect.py output_directory graphics_name")
+output_folder = sys.argv[1]
+graphics_file = sys.argv[2]
 
 #%% physical constants
 G = 6.67430e-11 # Universal constant of gravitation, in N*m^2/kg^2
@@ -141,11 +150,10 @@ def interior_geoid(cells,x,y,drho,obs_x,obs_y,method='line'):
 
 def surface_geoid(ind_surf,x,rho,topo,obs_x):
     x_surf = x[ind_surf]
-    sigma_surf = rho[ind_surf]*topo[ind_surf]
+    sigma_surf = -rho[ind_surf]*topo[ind_surf]
     N = np.zeros((len(sigma_surf)-1,len(obs_x)))
     for i in range(len(sigma_surf)-1):
         sigma_tmp = 0.5*(sigma_surf[i+1]+sigma_surf[i])
-        # kludge = place density anomaly at 1m depth until singularities are sorted out.
         N[i,:] = N_sheet(x_surf[i],x_surf[i+1],0.0,sigma_tmp,obs_x).flatten()
     N = np.sum(N,axis=0)
     return N
@@ -166,8 +174,8 @@ def cmb_geoid(ind_botm,x,y,rho,topo,obs_x,rho_below=9900.):
     return N
     
 #%% Do the geoid calculation
-mesh_file = 'output_boxslab_topcrust_h5/solution/mesh-00000.h5'
-file0 = 'output_boxslab_topcrust_h5/solution/solution-00000.h5'
+mesh_file = output_folder+'/solution/mesh-00000.h5'
+file0 = output_folder+'/solution/solution-00000.h5'
 cells,x,y,rho,topo = load_data(mesh_file,file0) 
 ind_surf,x_surf,ind_botm,x_botm = get_boundary_arrays(x,y)
 x_obs,y_obs = get_observation_vector(x,y,use_nodes=True)
@@ -198,4 +206,5 @@ ax2.plot(x_obs,N_cmb,label='cmb')
 ax2.plot(x_obs,N_total,'k',label='Total')
 ax2.set_ylabel('Geoid anomaly (m)')
 ax2.legend()
-plt.show()
+#plt.show()
+plt.savefig(graphics_file + '_geoid.svg')
