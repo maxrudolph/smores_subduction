@@ -12,7 +12,7 @@ This only works for 2D, Cartesian models.
 #%% imports
 import numpy as np
 #from vtureader import *
-import h5py as h5
+
 import scipy.interpolate as interp
 import matplotlib.pyplot as plt
 from tqdm import tqdm

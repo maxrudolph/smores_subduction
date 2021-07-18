@@ -14,9 +14,9 @@ def run_aspect(parameters,base_input_file):
     prm_filename = 'run.prm'
     # replace strings in the 'base input file' with the parameter values, which are stored in a dictionary.
     subprocess.run(["cp",base_input_file,prm_filename])
-    for key in table.keys():
+    for key in parameters.keys():
         # use the sed command to replace each of the keys in the ditionary with its appropriate value.
-        subprocess.run(["sed","-i","s/"+key+"/"+table[key]+"/g",prm_filename])
+        subprocess.run(["sed","-i","s/"+key+"/"+parameters[key]+"/g",prm_filename])
     
     # run aspect
     aspect_command = 'mpirun -n 20 ./aspect ' + prm_filename
