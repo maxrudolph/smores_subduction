@@ -170,11 +170,11 @@ mesh_file = 'output_boxslab_topcrust_h5/solution/mesh-00000.h5'
 file0 = 'output_boxslab_topcrust_h5/solution/solution-00000.h5'
 cells,x,y,rho,topo = load_data(mesh_file,file0) 
 ind_surf,x_surf,ind_botm,x_botm = get_boundary_arrays(x,y)
-x_obs,y_obs = get_observation_vector(x,y,use_nodes=True)
+x_obs,y_obs = get_observation_vector(x,y,use_nodes=False)
 delta_rho = get_density_anomaly(cells,x,y,rho)
 
 N_interior = interior_geoid(cells,x,y,delta_rho,x_obs,y_obs,method='line')
-#N_interior_patch = interior_geoid(cells,x,y,delta_rho,x_obs,y_obs,method='patch')
+#N_interior_patch = interior_geoid(cells,x,y,delta_rho,x_obs,y_obs,method='patch') # very slow.
 N_surface = surface_geoid(ind_surf,x,rho,topo,x_obs)
 N_cmb = cmb_geoid(ind_botm,x,y,rho,topo,x_obs)
 N_total = N_surface + N_interior + N_cmb
