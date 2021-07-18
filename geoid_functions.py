@@ -7,6 +7,11 @@ Helper functions for geoid calculation
 
 @author: max
 """
+import h5py as h5
+import numpy as np
+import scipy.interpolate as interp
+
+
 #%% physical constants
 G = 6.67430e-11 # Universal constant of gravitation, in N*m^2/kg^2
 g0 =  9.80665 
