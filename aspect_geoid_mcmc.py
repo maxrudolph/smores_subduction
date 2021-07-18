@@ -7,7 +7,7 @@ Created on Sun Jul 18 09:24:24 2021
 """
 import numpy as np
 import subprocess
-from geoid_from_aspect import *
+from geoid_functions import *
 from copy import deepcopy
 
 def run_aspect(parameters,base_input_file):
