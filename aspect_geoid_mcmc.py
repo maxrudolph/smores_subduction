@@ -16,7 +16,7 @@ def run_aspect(parameters,base_input_file):
     subprocess.run(["cp",base_input_file,prm_filename])
     for key in parameters.keys():
         # use the sed command to replace each of the keys in the ditionary with its appropriate value.
-        subprocess.run(["sed","-i","s/"+key+"/"+parameters[key]+"/g",prm_filename])
+        subprocess.run(["sed","-i","-e","s/"+key+"/"+'{:e}'.format(parameters[key])+"/g",prm_filename])
     
     # run aspect
     aspect_command = 'mpirun -n 20 ./aspect ' + prm_filename
@@ -97,7 +97,9 @@ def MCMC(starting_solution=None,n_steps=1000,save_start=500,save_skip=10,var=Non
 def main():
     # 1. guess an initial solution.
     parameters = dict()
-    parameters['ETA0'] = 1.0e21
+    parameters['PREFACTOR0'] = 1.4250e-15
+    parameters['PREFACTOR1'] = 1.4250e-15
+    parameters['PREFACTOR2'] = 1.0657e-18
     # 2. call the MCMC function
     MCMC(parameters)
     # 3. plotting/analysis of the output.
