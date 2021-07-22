@@ -13,7 +13,7 @@ from copy import deepcopy
 def setup_aspect_runs(run_dir='/dev/shm/geoidtmp/',base_input_file='boxslab_base.prm'):
     # make the run directory:
     try:
-        subproocess.run['mkdir',run_dir]
+        subprocess.run(['mkdir',run_dir[:-1]])
     except:
         print('run directory '+run_dir+' already exists or cannot be created')        
     # copy the aspect executable to the run directory
@@ -29,9 +29,9 @@ def run_aspect(parameters,base_input_file = 'boxslab_base.prm',run_dir='./'):
     #should remove previous output directory with same name
     #run as ls command before rm (be careful)
     
-    prm_filename = 'run.prm'
+    prm_filename =  'run.prm'
     # replace strings in the 'base input file' with the parameter values, which are stored in a dictionary.
-    subprocess.run(["cp",base_input_file,prm_filename])
+    subprocess.run(["cp",base_input_file,prm_filename],cwd=run_dir)
     for key in parameters.keys():
         # use the sed command to replace each of the keys in the ditionary with its appropriate value.
         subprocess.run(["sed","-i","-e","s/"+key+"/"+'{:e}'.format(parameters[key])+"/g",prm_filename],cwd=run_dir)
@@ -171,22 +171,34 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
 #def main():
     # 1. guess an initial solution.
 parameters = dict()
-parameters['PREFACTOR0'] = 1.4250e-15
+parameters['PREFACTOR0'] = 2e-15#1.4250e-15 
 parameters['PREFACTOR1'] = 1.4250e-15
 parameters['PREFACTOR2'] = 1.0657e-18
 
 parameter_bounds = dict()
 #add third number for amplitude of pertubation
-parameter_bounds['PREFACTOR0'] = [1.4e-15, 1.45e-15]
+parameter_bounds['PREFACTOR0'] = [1.0e-15, 2.0e-15]
 parameter_bounds['PREFACTOR1'] = [1.4e-15, 1.45e-15]
 parameter_bounds['PREFACTOR2'] = [9e-19, 1.2e-18]
 
 #run_aspect(parameters,'boxslab_base.prm')
 observed_geoid = calculate_geoid('starter')
-ensemble, solution_archive = MCMC(parameters, parameter_bounds, observed_geoid, var=1.0)
+residual, solution_archive = MCMC(parameters, parameter_bounds, observed_geoid, var=1.0,n_steps=100,save_start=50)
     # 2. call the MCMC function
     #MCMC(parameters)
     # 3. plotting/analysis of the output.
 #    pass
 
 #calculate_geoid('boxslab_topcrust_deep')
+#%% plotting
+import matplotlib.pyplot as plt
+plt.figure()
+plt.plot(residual)
+plt.show()
+
+plt.figure()
+for i in range(3):
+    plt.subplot(1,3,i+1)
+    key = list(parameters.keys())[i]
+    plt.hist([p[key] for p in solution_archive])
+plt.show()
