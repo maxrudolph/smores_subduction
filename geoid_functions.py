@@ -10,6 +10,7 @@ Helper functions for geoid calculation
 import h5py as h5
 import numpy as np
 import scipy.interpolate as interp
+import tqdm as tqdm
 
 
 #%% physical constants

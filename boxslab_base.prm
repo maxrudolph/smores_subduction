@@ -9,7 +9,7 @@ set End time 								= 0
 set Pressure normalization                  = surface
 set Surface pressure                       	= 0  
 set Adiabatic surface temperature 	 		= 273
-set Output directory 						= boxslab_topcrust_deep
+set Output directory 						= boxslab_base
 set Nonlinear solver scheme 				= no Advection, single Stokes
 set World builder file 						= boxslab_topcrust.wb
 
@@ -127,7 +127,7 @@ end
 subsection Mesh refinement
   set Initial global refinement = 4
   set Minimum refinement level  = 4
-  set Initial adaptive refinement = 5
+  set Initial adaptive refinement = 0 #5
   set Strategy = viscosity, density, minimum refinement function, maximum refinement function
   set Refinement fraction 		 = 0.80
   set Coarsening fraction		 = 0.10
