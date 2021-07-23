@@ -36,7 +36,7 @@ def run_aspect(parameters,base_input_file = 'boxslab_base.prm',run_dir='./'):
     for key in parameters.keys():
         # use the sed command to replace each of the keys in the ditionary with its appropriate value.
         subprocess.run(["sed","-i","-e","s/"+key+"/"+'{:e}'.format(parameters[key])+"/g",prm_filename], cwd = run_dir)
-    
+
     # run aspect
     aspect_command = './aspect-master.fast' #+ prm_filename
     subprocess.run([aspect_command, prm_filename],cwd=run_dir) # run aspect
@@ -72,7 +72,7 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
     var_change = 0.1
         
     if var is None:
-        accepted_var = 100
+        accepted_var = 1e6
         allow_hierarchical = True   #variance can change 
     else:
         accepted_var = var
@@ -92,7 +92,7 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
     ensemble_residual = []
     solution_archive = []
     var_archive = []
-    
+
     # 3. Begin the MCMC procedure
     for iter in range(n_steps):
         success = False
@@ -130,6 +130,7 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
                     success = False
                 else:
                     success = True
+
             #     0. perturb the value of the 0th parameter
             # ...
             #     n-1. perturn the value of the (n-1)th parameter
@@ -140,20 +141,20 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
             # ...
             # if n_tries > some threshold, we are stuck in an infinite loop. print an error message and exit.
         # Calculate the forward model for the proposed solution
-        run_aspect(proposed_solution, 'boxslab_base.prm')
+        run_aspect(proposed_solution, 'boxslab_base.prm', run_dir = run_dir)
         # calculate the geoid from the aspect model.
-        proposed_geoid = calculate_geoid('boxslab_base')
+        proposed_geoid = calculate_geoid('boxslab_base', run_dur=run_dir)
         # calculate the misfit
         proposed_residual = proposed_geoid - observed_geoid
         proposed_magnitude = np.dot(proposed_residual, proposed_residual)
         #print(proposed_magnitude)
         
-        # calculate the likelihood
         N = len(observed_geoid)
         #Cd_hat = np.identity(N)
         
         log_alpha = N/2*((np.log(accepted_var)) - np.log(proposed_var)) \
             - 1/(2*proposed_var)*proposed_magnitude + 1/(2*accepted_var)*accepted_magnitude
+
         #print('log_alpha is:', log_alpha)
 
         proposed_likelihood = None
@@ -183,7 +184,7 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
 #def main():
     # 1. guess an initial solution.
 parameters = dict()
-parameters['PREFACTOR0'] = 1.4250e-15
+parameters['PREFACTOR0'] = 2e-15#1.4250e-15 
 parameters['PREFACTOR1'] = 1.4250e-15
 parameters['PREFACTOR2'] = 1.0657e-18
 
@@ -205,6 +206,7 @@ plt.title('residuals')
 plt.show()
 plt.savefig('residuals.png')
 plt.close()
+
     # 2. call the MCMC function
     #MCMC(parameters)
     # 3. plotting/analysis of the output.
@@ -218,6 +220,7 @@ plt.savefig('variances.png')
 plt.show()
 plt.close()
 
+
 plt.figure()
 for i in range(3):
     plt.subplot(1,3,i+1)
@@ -226,5 +229,3 @@ for i in range(3):
 plt.title('parameter histograms')
 plt.show()
 plt.savefig('parameters.png')
-
-
