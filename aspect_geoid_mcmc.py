@@ -143,7 +143,7 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
         # Calculate the forward model for the proposed solution
         run_aspect(proposed_solution, 'boxslab_base.prm', run_dir = run_dir)
         # calculate the geoid from the aspect model.
-        proposed_geoid = calculate_geoid('boxslab_base', run_dur=run_dir)
+        proposed_geoid = calculate_geoid('boxslab_base', run_dir=run_dir)
         # calculate the misfit
         proposed_residual = proposed_geoid - observed_geoid
         proposed_magnitude = np.dot(proposed_residual, proposed_residual)
