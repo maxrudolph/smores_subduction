@@ -7,6 +7,7 @@ Created on Sun Jul 18 09:24:24 2021
 """
 import numpy as np
 import subprocess
+import matplotlib.pyplot as plt
 from geoid_functions import *
 from copy import deepcopy
 
@@ -34,8 +35,8 @@ def run_aspect(parameters,base_input_file = 'boxslab_base.prm',run_dir='./'):
     subprocess.run(["cp",base_input_file,prm_filename],cwd=run_dir)
     for key in parameters.keys():
         # use the sed command to replace each of the keys in the ditionary with its appropriate value.
-        subprocess.run(["sed","-i","-e","s/"+key+"/"+'{:e}'.format(parameters[key])+"/g",prm_filename],cwd=run_dir)
-    
+        subprocess.run(["sed","-i","-e","s/"+key+"/"+'{:e}'.format(parameters[key])+"/g",prm_filename], cwd = run_dir)
+
     # run aspect
     aspect_command = './aspect-master.fast' #+ prm_filename
     subprocess.run([aspect_command, prm_filename],cwd=run_dir) # run aspect
@@ -60,14 +61,18 @@ def calculate_geoid(output_folder,run_dir='./'):
     N_total = N_surface + N_interior + N_cmb
     return N_total
 
-def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_steps=10,save_start=0,save_skip=1,var=None):
+def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_steps=1000,save_start=500,save_skip=2,var=None):
     # This function should implement the MCMC procedure
     # 1. Define the perturbations (proposal distributions) for each parameter
     #    and the bounds on each parameter. Define the total number of steps and
     #    the number of steps between saving output.
     # if var is None, assume that this calculation uses a hierarchical hyperparameter.
+    var_min = 1e-6
+    var_max = 1e10
+    var_change = 0.1
+        
     if var is None:
-        accepted_var = 1.0
+        accepted_var = 1e6
         allow_hierarchical = True   #variance can change 
     else:
         accepted_var = var
@@ -81,12 +86,13 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
     accepted_geoid = calculate_geoid('boxslab_base',run_dir=run_dir)
     accepted_residual = accepted_geoid - observed_geoid
     accepted_magnitude = np.dot(accepted_residual, accepted_residual)
-    print(accepted_magnitude)
+    #print(accepted_magnitude)
     
     #create ensemble archive
     ensemble_residual = []
     solution_archive = []
-    
+    var_archive = []
+
     # 3. Begin the MCMC procedure
     for iter in range(n_steps):
         success = False
@@ -94,6 +100,7 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
         while( success is False and n_tries < 100):
             n_tries += 1
             proposed_solution = deepcopy(accepted_solution)
+            proposed_var = accepted_var
             # n_options should be equal to the number of parameters if allow_hierarchical is False
             # otherwise, n_options = (number of parameters) + 1
             if(allow_hierarchical == False):
@@ -103,23 +110,27 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
            
             
             # Choose one an opitions at random
-            
             # pick integer between (0, n_options)
             
             
-            
             vary_parameter = np.random.randint(0,n_options)
-            key = list(parameters.keys())[vary_parameter]
-            print(key)
-            proposed_solution[key] = proposed_solution[key] + 1e-17*np.random.randn()
-            print(proposed_solution[key])
-            #need case for when allow_hierarchical is True
-            
-            if proposed_solution[key] > parameter_bounds[key][1] or \
-                proposed_solution[key] < parameter_bounds[key][0]:
-                success = False
+            if(vary_parameter < n_options - 1):    
+                key = list(parameters.keys())[vary_parameter]
+                #print(key)
+                proposed_solution[key] = proposed_solution[key] + 1e-16*np.random.randn()
+                #print(proposed_solution[key])
+                if proposed_solution[key] > parameter_bounds[key][1] or proposed_solution[key] < parameter_bounds[key][0]:
+                    success = False
+                else: 
+                    success = True
+                    pass
             else:
-                success = True
+                proposed_var = np.exp(np.log(accepted_var) + var_change*np.random.randn())
+                if proposed_var > var_max or proposed_var < var_min:
+                    success = False
+                else:
+                    success = True
+
             #     0. perturb the value of the 0th parameter
             # ...
             #     n-1. perturn the value of the (n-1)th parameter
@@ -130,22 +141,21 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
             # ...
             # if n_tries > some threshold, we are stuck in an infinite loop. print an error message and exit.
         # Calculate the forward model for the proposed solution
-        run_aspect(proposed_solution, 'boxslab_base.prm',run_dir=run_dir)
+        run_aspect(proposed_solution, 'boxslab_base.prm', run_dir = run_dir)
         # calculate the geoid from the aspect model.
-        proposed_geoid = calculate_geoid('boxslab_base',run_dir=run_dir)
+        proposed_geoid = calculate_geoid('boxslab_base', run_dir=run_dir)
         # calculate the misfit
         proposed_residual = proposed_geoid - observed_geoid
         proposed_magnitude = np.dot(proposed_residual, proposed_residual)
-        print(proposed_magnitude)
+        #print(proposed_magnitude)
         
-        # calculate the likelihood
-        proposed_var = 1.0  #?
         N = len(observed_geoid)
         #Cd_hat = np.identity(N)
         
         log_alpha = N/2*((np.log(accepted_var)) - np.log(proposed_var)) \
             - 1/(2*proposed_var)*proposed_magnitude + 1/(2*accepted_var)*accepted_magnitude
-        print('log_alpha is:', log_alpha)
+
+        #print('log_alpha is:', log_alpha)
 
         proposed_likelihood = None
         # calculate the probability of acceptance using the Metropolis-Hastings Criterion
@@ -156,8 +166,11 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
             # accept the proposed solution by copying the proposed solution
             # to the accepted solution.
             pass
-        if iter > save_start and not (iter % save_skip):
-            ensemble_residual.append(accepted_magnitude)
+        
+        ensemble_residual.append(accepted_magnitude) 
+        var_archive.append(accepted_var)
+        
+        if iter > save_start and not (iter % save_skip):    
             solution_archive.append(deepcopy(accepted_solution))
             
             # save the accepted solution to the archive
@@ -165,7 +178,7 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
             # also save the likelihood of the accepted solution
             # also save the misfit of the accepted solution
             pass                        
-    return ensemble_residual, solution_archive # return the solution archive - this is the ensemble!
+    return ensemble_residual, solution_archive, var_archive# return the solution archive - this is the ensemble!
 
 
 #def main():
@@ -177,28 +190,42 @@ parameters['PREFACTOR2'] = 1.0657e-18
 
 parameter_bounds = dict()
 #add third number for amplitude of pertubation
-parameter_bounds['PREFACTOR0'] = [1.0e-15, 2.0e-15]
-parameter_bounds['PREFACTOR1'] = [1.4e-15, 1.45e-15]
-parameter_bounds['PREFACTOR2'] = [9e-19, 1.2e-18]
+parameter_bounds['PREFACTOR0'] = [1.425e-16, 1.425e-14]
+parameter_bounds['PREFACTOR1'] = [1.425e-16, 1.425e-14]
+parameter_bounds['PREFACTOR2'] = [1.0657e-19, 1.0657e-17]
 
-#run_aspect(parameters,'boxslab_base.prm')
+run_aspect(parameters,'starter.prm')                
 observed_geoid = calculate_geoid('starter')
-residual, solution_archive = MCMC(parameters, parameter_bounds, observed_geoid, var=1.0,n_steps=100,save_start=50)
+residual, solution_archive, var_archive = MCMC(parameters, parameter_bounds, observed_geoid)
+#%%
+steps = len(residual)
+x = np.linspace(1, steps, steps)
+plt.plot(x, residual)
+plt.yscale('log')
+plt.title('residuals')
+plt.show()
+plt.savefig('residuals.png')
+plt.close()
+
     # 2. call the MCMC function
     #MCMC(parameters)
     # 3. plotting/analysis of the output.
 #    pass
-
-#calculate_geoid('boxslab_topcrust_deep')
-#%% plotting
-import matplotlib.pyplot as plt
-plt.figure()
-plt.plot(residual)
+steps2 = len(var_archive)
+x2 = np.linspace(1, steps2, steps2)
+plt.plot(x2, var_archive)
+plt.yscale('log')
+plt.title('variances')
+plt.savefig('variances.png')
 plt.show()
+plt.close()
+
 
 plt.figure()
 for i in range(3):
     plt.subplot(1,3,i+1)
     key = list(parameters.keys())[i]
     plt.hist([p[key] for p in solution_archive])
+plt.title('parameter histograms')
 plt.show()
+plt.savefig('parameters.png')
