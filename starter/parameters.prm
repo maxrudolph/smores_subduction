@@ -7894,7 +7894,7 @@ subsection Mesh refinement
   # refinement but while still within the first time step. These refinement
   # steps (n) are added to the value for initial global refinement (m) so that
   # the final mesh has cells that are at most on refinement level $n+m$.
-  set Initial adaptive refinement                         = 5                                                                            # default: 0
+  set Initial adaptive refinement                         = 0
 
   # The number of global refinement steps performed on the initial coarse
   # mesh, before the problem is first solved there.

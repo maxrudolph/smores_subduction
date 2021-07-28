@@ -20,23 +20,30 @@ Number of degrees of freedom: 48,180 (12,610+1,617+6,305+13,824+13,824)
    Rebuilding Stokes preconditioner...
    Solving Stokes system... 104+0 iterations.
 
-Number of active cells: 2,442 (on 6 levels)
-Number of degrees of freedom: 77,412 (20,554+2,625+10,277+21,978+21,978)
+   Postprocessing:
+     Pressure at top/bottom of domain: -1.716e-06 Pa, 1.005e+11 Pa
+     Computing dynamic topography      
+     Writing graphical output:         starter/solution/solution-00000
 
-*** Timestep 0:  t=0 years, dt=0 years
-   Rebuilding Stokes preconditioner...
-   Solving Stokes system... 200+24 iterations.
+Termination requested by criterion: end time
 
-Number of active cells: 4,959 (on 7 levels)
-Number of degrees of freedom: 158,432 (42,514+5,399+21,257+44,631+44,631)
 
-*** Timestep 0:  t=0 years, dt=0 years
-   Rebuilding Stokes preconditioner...
-   Solving Stokes system... 200+37 iterations.
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |      1.08s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| Assemble Stokes system          |         1 |    0.0737s |       6.8% |
+| Build Stokes preconditioner     |         1 |    0.0935s |       8.7% |
+| Initialization                  |         1 |     0.123s |        11% |
+| Postprocessing                  |         1 |     0.133s |        12% |
+| Setup dof systems               |         1 |    0.0122s |       1.1% |
+| Setup initial conditions        |         1 |     0.177s |        16% |
+| Setup matrices                  |         1 |     0.075s |       6.9% |
+| Solve Stokes system             |         1 |     0.349s |        32% |
++---------------------------------+-----------+------------+------------+
 
-Number of active cells: 11,019 (on 8 levels)
-Number of degrees of freedom: 353,560 (95,434+12,067+47,717+99,171+99,171)
-
-*** Timestep 0:  t=0 years, dt=0 years
-   Rebuilding Stokes preconditioner...
-   Solving Stokes system... 
+-----------------------------------------------------------------------------
+-- For information on how to cite ASPECT, see:
+--   https://aspect.geodynamics.org/citing.html?ver=2.4.0-pre&GWB=1&dg=1&sha=172651c82&src=code
+-----------------------------------------------------------------------------

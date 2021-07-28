@@ -6335,7 +6335,7 @@
             "pattern_description": "[Double 0...1 (inclusive)]"
         },
         "Initial_20adaptive_20refinement": {
-            "value": "5",
+            "value": "0",
             "default_value": "0",
             "documentation": "The number of adaptive refinement steps performed after initial global refinement but while still within the first time step. These refinement steps (n) are added to the value for initial global refinement (m) so that the final mesh has cells that are at most on refinement level $n+m$.",
             "pattern": "54",

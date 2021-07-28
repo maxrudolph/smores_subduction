@@ -61,7 +61,7 @@ def calculate_geoid(output_folder,run_dir='./'):
     N_total = N_surface + N_interior + N_cmb
     return N_total
 
-def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_steps=2000,save_start=1000,save_skip=1,var=None):
+def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_steps=2000,save_start=1000,save_skip=2,var=None):
     # This function should implement the MCMC procedure
     # 1. Define the perturbations (proposal distributions) for each parameter
     #    and the bounds on each parameter. Define the total number of steps and
@@ -117,10 +117,7 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
             if(vary_parameter < n_options - 1):    
                 key = list(parameters.keys())[vary_parameter]
                 #print(key)
-                if key == 'PREFACTOR2':    
-                    proposed_solution[key] = proposed_solution[key] + 1e-19*np.random.randn()
-                else:
-                    proposed_solution[key] = proposed_solution[key] + 1e-16*np.random.randn()
+                proposed_solution[key] = np.exp(np.log(proposed_solution[key]) + 0.1*np.random.randn())
                 #print(proposed_solution[key])
                 if proposed_solution[key] > parameter_bounds[key][1] or proposed_solution[key] < parameter_bounds[key][0]:
                     success = False
@@ -197,7 +194,14 @@ parameter_bounds['PREFACTOR0'] = [1.425e-16, 1.425e-14]
 parameter_bounds['PREFACTOR1'] = [1.425e-16, 1.425e-14]
 parameter_bounds['PREFACTOR2'] = [1.0657e-19, 1.0657e-17]
 
-#run_aspect(parameters,'starter.prm')                
+starter_parameters = dict()
+parameters['PREFACTOR0'] = 1.4250e-15 
+parameters['PREFACTOR1'] = 1.4250e-15
+parameters['PREFACTOR2'] = 1.0657e-18
+
+
+#create starter.prm from starter_parameters
+run_aspect(parameters,'starter.prm')                
 observed_geoid = calculate_geoid('starter')
 residual, solution_archive, var_archive = MCMC(parameters, parameter_bounds, observed_geoid)
 #%%
@@ -219,8 +223,8 @@ x2 = np.linspace(1, steps2, steps2)
 plt.plot(x2, var_archive)
 plt.yscale('log')
 plt.title('variances')
-plt.savefig('variances.png')
 plt.show()
+plt.savefig('variances.png')
 plt.close()
 
 
@@ -228,7 +232,10 @@ plt.figure()
 for i in range(3):
     plt.subplot(1,3,i+1)
     key = list(parameters.keys())[i]
-    plt.hist([p[key] for p in solution_archive])
+    plt.hist(np.log10([p[key] for p in solution_archive]), bins=100, range=np.log10(parameter_bounds[key]))
+    #add vertical line for starter parameter values
+    
 plt.title('parameter histograms')
 plt.show()
 plt.savefig('parameters.png')
+plt.close()
