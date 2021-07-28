@@ -61,7 +61,7 @@ def calculate_geoid(output_folder,run_dir='./'):
     N_total = N_surface + N_interior + N_cmb
     return N_total
 
-def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_steps=2000,save_start=1000,save_skip=2,var=None):
+def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_steps=100,save_start=0,save_skip=2,var=None):
     # This function should implement the MCMC procedure
     # 1. Define the perturbations (proposal distributions) for each parameter
     #    and the bounds on each parameter. Define the total number of steps and
@@ -72,7 +72,7 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
     var_change = 0.1
         
     if var is None:
-        accepted_var = 1e6
+        accepted_var = 1
         allow_hierarchical = True   #variance can change 
     else:
         accepted_var = var
@@ -208,7 +208,7 @@ residual, solution_archive, var_archive = MCMC(parameters, parameter_bounds, obs
 steps = len(residual)
 x = np.linspace(1, steps, steps)
 plt.plot(x, residual)
-plt.yscale('log')
+#plt.yscale('log')
 plt.title('residuals')
 plt.show()
 plt.savefig('residuals.png')
@@ -232,7 +232,8 @@ plt.figure()
 for i in range(3):
     plt.subplot(1,3,i+1)
     key = list(parameters.keys())[i]
-    plt.hist(np.log10([p[key] for p in solution_archive]), bins=100, range=np.log10(parameter_bounds[key]))
+    plt.hist([p[key] for p in solution_archive])
+    #plt.hist(np.log10([p[key] for p in solution_archive]), bins=100, range=np.log10(parameter_bounds[key]))
     #add vertical line for starter parameter values
     
 plt.title('parameter histograms')

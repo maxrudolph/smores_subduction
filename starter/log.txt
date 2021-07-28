@@ -21,7 +21,7 @@ Number of degrees of freedom: 48,180 (12,610+1,617+6,305+13,824+13,824)
    Solving Stokes system... 104+0 iterations.
 
    Postprocessing:
-     Pressure at top/bottom of domain: -1.716e-06 Pa, 1.005e+11 Pa
+     Pressure at top/bottom of domain: -2.493e-06 Pa, 1.005e+11 Pa
      Computing dynamic topography      
      Writing graphical output:         starter/solution/solution-00000
 
@@ -29,18 +29,18 @@ Termination requested by criterion: end time
 
 
 +---------------------------------------------+------------+------------+
-| Total wallclock time elapsed since start    |      1.08s |            |
+| Total wallclock time elapsed since start    |      1.87s |            |
 |                                             |            |            |
 | Section                         | no. calls |  wall time | % of total |
 +---------------------------------+-----------+------------+------------+
-| Assemble Stokes system          |         1 |    0.0737s |       6.8% |
-| Build Stokes preconditioner     |         1 |    0.0935s |       8.7% |
-| Initialization                  |         1 |     0.123s |        11% |
-| Postprocessing                  |         1 |     0.133s |        12% |
-| Setup dof systems               |         1 |    0.0122s |       1.1% |
-| Setup initial conditions        |         1 |     0.177s |        16% |
-| Setup matrices                  |         1 |     0.075s |       6.9% |
-| Solve Stokes system             |         1 |     0.349s |        32% |
+| Assemble Stokes system          |         1 |     0.152s |       8.1% |
+| Build Stokes preconditioner     |         1 |     0.143s |       7.7% |
+| Initialization                  |         1 |     0.231s |        12% |
+| Postprocessing                  |         1 |      0.24s |        13% |
+| Setup dof systems               |         1 |    0.0217s |       1.2% |
+| Setup initial conditions        |         1 |     0.273s |        15% |
+| Setup matrices                  |         1 |     0.145s |       7.8% |
+| Solve Stokes system             |         1 |     0.578s |        31% |
 +---------------------------------+-----------+------------+------------+
 
 -----------------------------------------------------------------------------
