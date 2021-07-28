@@ -1,0 +1,86 @@
+-----------------------------------------------------------------------------
+-- This is ASPECT, the Advanced Solver for Problems in Earth's ConvecTion.
+--     . version 2.4.0-pre (master, 172651c82)
+--     . using deal.II 9.2.0
+--     .       with 32 bit indices and vectorization level 1 (128 bits)
+--     . using Trilinos 12.18.1
+--     . using p4est 2.2.0
+--     . running in OPTIMIZED mode
+--     . running with 1 MPI process
+-----------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------
+-- For information on how to cite ASPECT, see:
+--   https://aspect.geodynamics.org/citing.html?ver=2.4.0-pre&GWB=1&dg=1&sha=172651c82&src=code
+-----------------------------------------------------------------------------
+Number of active cells: 1,536 (on 5 levels)
+Number of degrees of freedom: 48,180 (12,610+1,617+6,305+13,824+13,824)
+
+*** Timestep 0:  t=0 years, dt=0 years
+   Rebuilding Stokes preconditioner...
+   Solving Stokes system... 57+0 iterations.
+
+Number of active cells: 2,457 (on 6 levels)
+Number of degrees of freedom: 77,890 (20,682+2,641+10,341+22,113+22,113)
+
+*** Timestep 0:  t=0 years, dt=0 years
+   Rebuilding Stokes preconditioner...
+   Solving Stokes system... 194+0 iterations.
+
+Number of active cells: 5,007 (on 7 levels)
+Number of degrees of freedom: 159,946 (42,914+5,449+21,457+45,063+45,063)
+
+*** Timestep 0:  t=0 years, dt=0 years
+   Rebuilding Stokes preconditioner...
+   Solving Stokes system... 200+6 iterations.
+
+Number of active cells: 11,127 (on 8 levels)
+Number of degrees of freedom: 357,129 (96,434+12,192+48,217+100,143+100,143)
+
+*** Timestep 0:  t=0 years, dt=0 years
+   Rebuilding Stokes preconditioner...
+   Solving Stokes system... 200+16 iterations.
+
+Number of active cells: 23,433 (on 9 levels)
+Number of degrees of freedom: 757,058 (206,170+26,009+103,085+210,897+210,897)
+
+*** Timestep 0:  t=0 years, dt=0 years
+   Rebuilding Stokes preconditioner...
+   Solving Stokes system... 200+19 iterations.
+
+Number of active cells: 25,425 (on 9 levels)
+Number of degrees of freedom: 818,516 (221,926+27,977+110,963+228,825+228,825)
+
+*** Timestep 0:  t=0 years, dt=0 years
+   Rebuilding Stokes preconditioner...
+   Solving Stokes system... 200+18 iterations.
+
+   Postprocessing:
+     Pressure at top/bottom of domain: -6.887e-05 Pa, 1.005e+11 Pa
+     Computing dynamic topography      
+     Writing graphical output:         boxslab_topcrust_deep_d/solution/solution-00000
+
+Termination requested by criterion: end time
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |       135s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| Assemble Stokes system          |         6 |      3.45s |       2.6% |
+| Build Stokes preconditioner     |         6 |      3.92s |       2.9% |
+| Initialization                  |         1 |     0.121s |         0% |
+| Postprocessing                  |         1 |      2.03s |       1.5% |
+| Refine mesh structure, part 1   |         5 |      5.77s |       4.3% |
+| Refine mesh structure, part 2   |         5 |     0.312s |      0.23% |
+| Setup dof systems               |         6 |       0.5s |      0.37% |
+| Setup initial conditions        |         6 |      14.4s |        11% |
+| Setup matrices                  |         6 |      3.91s |       2.9% |
+| Solve Stokes system             |         6 |      99.8s |        74% |
++---------------------------------+-----------+------------+------------+
+
+-----------------------------------------------------------------------------
+-- For information on how to cite ASPECT, see:
+--   https://aspect.geodynamics.org/citing.html?ver=2.4.0-pre&GWB=1&dg=1&sha=172651c82&src=code
+-----------------------------------------------------------------------------

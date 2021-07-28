@@ -1,0 +1,86 @@
+<?xml version="1.0" ?>
+<!DOCTYPE Xdmf SYSTEM "Xdmf.dtd" []>
+<Xdmf Version="2.0">
+  <Domain>
+    <Grid Name="CellTime" GridType="Collection" CollectionType="Temporal">
+      <Grid Name="mesh" GridType="Uniform">
+        <Time Value="0"/>
+        <Geometry GeometryType="XY">
+          <DataItem Dimensions="228825 2" NumberType="Float" Precision="8" Format="HDF">
+            solution/mesh-00000.h5:/nodes
+          </DataItem>
+        </Geometry>
+        <Topology TopologyType="Quadrilateral" NumberOfElements="101700">
+          <DataItem Dimensions="101700 4" NumberType="UInt" Format="HDF">
+            solution/mesh-00000.h5:/cells
+          </DataItem>
+        </Topology>
+        <Attribute Name="T" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="228825 1" NumberType="Float" Precision="8" Format="HDF">
+            solution/solution-00000.h5:/T
+          </DataItem>
+        </Attribute>
+        <Attribute Name="density" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="228825 1" NumberType="Float" Precision="8" Format="HDF">
+            solution/solution-00000.h5:/density
+          </DataItem>
+        </Attribute>
+        <Attribute Name="dynamic_topography" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="228825 1" NumberType="Float" Precision="8" Format="HDF">
+            solution/solution-00000.h5:/dynamic_topography
+          </DataItem>
+        </Attribute>
+        <Attribute Name="ovcrust" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="228825 1" NumberType="Float" Precision="8" Format="HDF">
+            solution/solution-00000.h5:/ovcrust
+          </DataItem>
+        </Attribute>
+        <Attribute Name="p" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="228825 1" NumberType="Float" Precision="8" Format="HDF">
+            solution/solution-00000.h5:/p
+          </DataItem>
+        </Attribute>
+        <Attribute Name="spcrust" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="228825 1" NumberType="Float" Precision="8" Format="HDF">
+            solution/solution-00000.h5:/spcrust
+          </DataItem>
+        </Attribute>
+        <Attribute Name="strain_rate" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="228825 1" NumberType="Float" Precision="8" Format="HDF">
+            solution/solution-00000.h5:/strain_rate
+          </DataItem>
+        </Attribute>
+        <Attribute Name="stress_xx" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="228825 1" NumberType="Float" Precision="8" Format="HDF">
+            solution/solution-00000.h5:/stress_xx
+          </DataItem>
+        </Attribute>
+        <Attribute Name="stress_xy" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="228825 1" NumberType="Float" Precision="8" Format="HDF">
+            solution/solution-00000.h5:/stress_xy
+          </DataItem>
+        </Attribute>
+        <Attribute Name="stress_yx" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="228825 1" NumberType="Float" Precision="8" Format="HDF">
+            solution/solution-00000.h5:/stress_yx
+          </DataItem>
+        </Attribute>
+        <Attribute Name="stress_yy" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="228825 1" NumberType="Float" Precision="8" Format="HDF">
+            solution/solution-00000.h5:/stress_yy
+          </DataItem>
+        </Attribute>
+        <Attribute Name="velocity" AttributeType="Vector" Center="Node">
+          <DataItem Dimensions="228825 3" NumberType="Float" Precision="8" Format="HDF">
+            solution/solution-00000.h5:/velocity
+          </DataItem>
+        </Attribute>
+        <Attribute Name="viscosity" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="228825 1" NumberType="Float" Precision="8" Format="HDF">
+            solution/solution-00000.h5:/viscosity
+          </DataItem>
+        </Attribute>
+      </Grid>
+    </Grid>
+  </Domain>
+</Xdmf>

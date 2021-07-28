@@ -41,8 +41,8 @@ def run_aspect(parameters,base_input_file = 'boxslab_base.prm',run_dir='./'):
     aspect_command = './aspect-master.fast' #+ prm_filename
     subprocess.run([aspect_command, prm_filename],cwd=run_dir) # run aspect
 
-    #aspect_command = '../aspect.fast' 
-    #subprocess.run(['mpirun', '-n', '20', aspect_command, prm_filename])
+    #aspect_command = './aspect.fast' 
+    #subprocess.run(['mpirun', '-n', '20', aspect_command, prm_filename],cwd=run_dir)
     
 def calculate_geoid(output_folder,run_dir='./'):
     # Do the geoid calculation
@@ -61,7 +61,7 @@ def calculate_geoid(output_folder,run_dir='./'):
     N_total = N_surface + N_interior + N_cmb
     return N_total
 
-def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_steps=1000,save_start=500,save_skip=2,var=None):
+def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_steps=2000,save_start=1000,save_skip=1,var=None):
     # This function should implement the MCMC procedure
     # 1. Define the perturbations (proposal distributions) for each parameter
     #    and the bounds on each parameter. Define the total number of steps and
@@ -117,7 +117,10 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
             if(vary_parameter < n_options - 1):    
                 key = list(parameters.keys())[vary_parameter]
                 #print(key)
-                proposed_solution[key] = proposed_solution[key] + 1e-16*np.random.randn()
+                if key == 'PREFACTOR2':    
+                    proposed_solution[key] = proposed_solution[key] + 1e-19*np.random.randn()
+                else:
+                    proposed_solution[key] = proposed_solution[key] + 1e-16*np.random.randn()
                 #print(proposed_solution[key])
                 if proposed_solution[key] > parameter_bounds[key][1] or proposed_solution[key] < parameter_bounds[key][0]:
                     success = False
@@ -194,7 +197,7 @@ parameter_bounds['PREFACTOR0'] = [1.425e-16, 1.425e-14]
 parameter_bounds['PREFACTOR1'] = [1.425e-16, 1.425e-14]
 parameter_bounds['PREFACTOR2'] = [1.0657e-19, 1.0657e-17]
 
-run_aspect(parameters,'starter.prm')                
+#run_aspect(parameters,'starter.prm')                
 observed_geoid = calculate_geoid('starter')
 residual, solution_archive, var_archive = MCMC(parameters, parameter_bounds, observed_geoid)
 #%%
