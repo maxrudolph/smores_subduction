@@ -9,7 +9,7 @@ set End time 								= 0
 set Pressure normalization                  = surface
 set Surface pressure                       	= 0  
 set Adiabatic surface temperature 	 		= 273
-set Output directory 						= boxslab_base
+set Output directory 						= starter
 set Nonlinear solver scheme 				= no Advection, single Stokes
 set World builder file 						= boxslab_topcrust.wb
 
@@ -111,7 +111,7 @@ subsection Material model
         set Grain size = 1.0000e-02
 #        set Prefactors for diffusion creep = background:1.4250e-15|1.4250e-15|1.0657e-18, \
 #        	spcrust:0.5e-20|1.4250e-15|1.0657e-18, ovcrust:0.5e-20
-        set Prefactors for diffusion creep = background:PREFACTOR0|PREFACTOR1|PREFACTOR2, \
+        set Prefactors for diffusion creep = background:1.425000e-15|1.425000e-15|1.065700e-18, \
         	spcrust:0.5e-20|1.4250e-15|1.0657e-18, ovcrust:0.5e-20
 
 

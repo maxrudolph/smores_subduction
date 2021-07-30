@@ -19,6 +19,7 @@ def setup_aspect_runs(run_dir='/dev/shm/geoidtmp/',base_input_file='boxslab_base
         print('run directory '+run_dir+' already exists or cannot be created')        
     # copy the aspect executable to the run directory
     subprocess.run(['cp','aspect-master.fast',run_dir])
+    #subprocess.run(['cp', 'aspect.fast', run_dir])
     subprocess.run(['cp',base_input_file,run_dir])
     subprocess.run(['cp','boxslab_topcrust.wb',run_dir])
     
@@ -38,11 +39,11 @@ def run_aspect(parameters,base_input_file = 'boxslab_base.prm',run_dir='./'):
         subprocess.run(["sed","-i","-e","s/"+key+"/"+'{:e}'.format(parameters[key])+"/g",prm_filename], cwd = run_dir)
 
     # run aspect
-    aspect_command = './aspect-master.fast' #+ prm_filename
-    subprocess.run([aspect_command, prm_filename],cwd=run_dir) # run aspect
+    #aspect_command = './aspect-master.fast' #+ prm_filename
+    #subprocess.run([aspect_command, prm_filename],cwd=run_dir) # run aspect
 
-    #aspect_command = './aspect.fast' 
-    #subprocess.run(['mpirun', '-n', '20', aspect_command, prm_filename],cwd=run_dir)
+    aspect_command = './aspect.fast' 
+    subprocess.run(['mpirun', '-n', '20', aspect_command, prm_filename],cwd=run_dir)
     
 def calculate_geoid(output_folder,run_dir='./'):
     # Do the geoid calculation
@@ -61,7 +62,7 @@ def calculate_geoid(output_folder,run_dir='./'):
     N_total = N_surface + N_interior + N_cmb
     return N_total
 
-def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_steps=2000,save_start=1000,save_skip=2,var=None):
+def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_steps=10000,save_start=8000,save_skip=2,var=None):
     # This function should implement the MCMC procedure
     # 1. Define the perturbations (proposal distributions) for each parameter
     #    and the bounds on each parameter. Define the total number of steps and
@@ -185,8 +186,8 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
     # 1. guess an initial solution.
 parameters = dict()
 parameters['PREFACTOR0'] = 2e-15#1.4250e-15 
-parameters['PREFACTOR1'] = 1.4250e-15
-parameters['PREFACTOR2'] = 1.0657e-18
+parameters['PREFACTOR1'] = 1e-15 #1.4250e-15
+parameters['PREFACTOR2'] = 3e-18#1.0657e-18
 
 parameter_bounds = dict()
 #add third number for amplitude of pertubation
@@ -205,13 +206,14 @@ run_aspect(parameters,'starter.prm')
 observed_geoid = calculate_geoid('starter')
 residual, solution_archive, var_archive = MCMC(parameters, parameter_bounds, observed_geoid)
 #%%
+print(residual)
 steps = len(residual)
 x = np.linspace(1, steps, steps)
 plt.plot(x, residual)
-#plt.yscale('log')
+plt.yscale('log')
 plt.title('residuals')
-plt.show()
 plt.savefig('residuals.png')
+#plt.show()
 plt.close()
 
     # 2. call the MCMC function
@@ -223,8 +225,8 @@ x2 = np.linspace(1, steps2, steps2)
 plt.plot(x2, var_archive)
 plt.yscale('log')
 plt.title('variances')
-plt.show()
 plt.savefig('variances.png')
+#plt.show()
 plt.close()
 
 
@@ -232,11 +234,12 @@ plt.figure()
 for i in range(3):
     plt.subplot(1,3,i+1)
     key = list(parameters.keys())[i]
-    plt.hist([p[key] for p in solution_archive])
-    #plt.hist(np.log10([p[key] for p in solution_archive]), bins=100, range=np.log10(parameter_bounds[key]))
+    #plt.hist([p[key] for p in solution_archive])
+    plt.hist(np.log10([p[key] for p in solution_archive]), bins=100, range=np.log10(parameter_bounds[key]))
     #add vertical line for starter parameter values
+    plt.axvline(np.log10(starter_parameters[key]), color='r', linewidth = 1)
     
 plt.title('parameter histograms')
-plt.show()
 plt.savefig('parameters.png')
+#plt.show()
 plt.close()
