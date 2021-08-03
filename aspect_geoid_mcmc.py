@@ -8,6 +8,7 @@ Created on Sun Jul 18 09:24:24 2021
 import numpy as np
 import subprocess
 import matplotlib.pyplot as plt
+import pickle
 from geoid_functions import *
 from copy import deepcopy
 
@@ -39,11 +40,11 @@ def run_aspect(parameters,base_input_file = 'boxslab_base.prm',run_dir='./'):
         subprocess.run(["sed","-i","-e","s/"+key+"/"+'{:e}'.format(parameters[key])+"/g",prm_filename], cwd = run_dir)
 
     # run aspect
-    #aspect_command = './aspect-master.fast' #+ prm_filename
-    #subprocess.run([aspect_command, prm_filename],cwd=run_dir) # run aspect
+    aspect_command = './aspect-master.fast' #+ prm_filename
+    subprocess.run([aspect_command, prm_filename],cwd=run_dir) # run aspect
 
-    aspect_command = './aspect.fast' 
-    subprocess.run(['mpirun', '-n', '20', aspect_command, prm_filename],cwd=run_dir)
+    #aspect_command = './aspect.fast' 
+    #subprocess.run(['mpirun', '-n', '20', aspect_command, prm_filename],cwd=run_dir)
     
 def calculate_geoid(output_folder,run_dir='./'):
     # Do the geoid calculation
@@ -62,7 +63,7 @@ def calculate_geoid(output_folder,run_dir='./'):
     N_total = N_surface + N_interior + N_cmb
     return N_total
 
-def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_steps=10000,save_start=8000,save_skip=2,var=None):
+def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_steps=100,save_start=0,save_skip=1,var=None):
     # This function should implement the MCMC procedure
     # 1. Define the perturbations (proposal distributions) for each parameter
     #    and the bounds on each parameter. Define the total number of steps and
@@ -206,40 +207,53 @@ run_aspect(parameters,'starter.prm')
 observed_geoid = calculate_geoid('starter')
 residual, solution_archive, var_archive = MCMC(parameters, parameter_bounds, observed_geoid)
 #%%
-print(residual)
-steps = len(residual)
-x = np.linspace(1, steps, steps)
-plt.plot(x, residual)
-plt.yscale('log')
-plt.title('residuals')
-plt.savefig('residuals.png')
-#plt.show()
-plt.close()
-
-    # 2. call the MCMC function
-    #MCMC(parameters)
-    # 3. plotting/analysis of the output.
-#    pass
-steps2 = len(var_archive)
-x2 = np.linspace(1, steps2, steps2)
-plt.plot(x2, var_archive)
-plt.yscale('log')
-plt.title('variances')
-plt.savefig('variances.png')
-#plt.show()
-plt.close()
 
 
-plt.figure()
-for i in range(3):
-    plt.subplot(1,3,i+1)
-    key = list(parameters.keys())[i]
-    #plt.hist([p[key] for p in solution_archive])
-    plt.hist(np.log10([p[key] for p in solution_archive]), bins=100, range=np.log10(parameter_bounds[key]))
-    #add vertical line for starter parameter values
-    plt.axvline(np.log10(starter_parameters[key]), color='r', linewidth = 1)
+#save residual values, ensemble parameters, and variance archive to pickle files
+with open('residuals.p', 'wb') as f1: 
+    pickle.dump(residual, f1)
     
-plt.title('parameter histograms')
-plt.savefig('parameters.png')
-#plt.show()
-plt.close()
+with open('parameters.p', 'wb') as f2: 
+    pickle.dump(solution_archive, f2)
+    
+with open('variances.p', 'wb') as f3:
+    pickle.dump(var_archive, f3)
+    
+with open('starter_parameters.p', 'wb') as f4:
+    pickle.dump(starter_parameters, f4)
+
+with open('parameter_bounds.p', 'wb') as f4:
+    pickle.dump(parameter_bounds, f4)
+# #print(residual)
+# steps = len(residual)
+# x = np.linspace(1, steps, steps)
+# plt.plot(x, residual)
+# plt.yscale('log')
+# plt.title('residuals')
+# plt.savefig('residuals.png')
+# #plt.show()
+# plt.close()
+
+# steps2 = len(var_archive)
+# x2 = np.linspace(1, steps2, steps2)
+# plt.plot(x2, var_archive)
+# plt.yscale('log')
+# plt.title('variances')
+# plt.savefig('variances.png')
+# #plt.show()
+# plt.close()
+
+
+# plt.figure()
+# for i in range(3):
+#     plt.subplot(1,3,i+1)
+#     key = list(parameters.keys())[i]
+#     #plt.hist([p[key] for p in solution_archive])
+#     plt.hist(np.log10([p[key] for p in solution_archive]), bins=100, range=np.log10(parameter_bounds[key]))
+#     #add vertical line for starter parameter values
+#     plt.axvline(np.log10(starter_parameters[key]), color='r', linewidth = 1)
+    
+# plt.title('parameter histograms')
+# plt.savefig('parameters.png')
+# #plt.show()
+# plt.close()
