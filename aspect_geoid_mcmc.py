@@ -210,50 +210,14 @@ residual, solution_archive, var_archive = MCMC(parameters, parameter_bounds, obs
 
 
 #save residual values, ensemble parameters, and variance archive to pickle files
-with open('residuals.p', 'wb') as f1: 
-    pickle.dump(residual, f1)
-    
-with open('parameters.p', 'wb') as f2: 
-    pickle.dump(solution_archive, f2)
-    
-with open('variances.p', 'wb') as f3:
-    pickle.dump(var_archive, f3)
-    
-with open('starter_parameters.p', 'wb') as f4:
-    pickle.dump(starter_parameters, f4)
+#save everything into one dictionary?
 
-with open('parameter_bounds.p', 'wb') as f4:
-    pickle.dump(parameter_bounds, f4)
-# #print(residual)
-# steps = len(residual)
-# x = np.linspace(1, steps, steps)
-# plt.plot(x, residual)
-# plt.yscale('log')
-# plt.title('residuals')
-# plt.savefig('residuals.png')
-# #plt.show()
-# plt.close()
+results = dict()
+results['residuals'] = residual
+results['parameters'] = solution_archive
+results['variances'] = var_archive
+results['starter_parameters'] = starter_parameters
+results['bounds'] = parameter_bounds
 
-# steps2 = len(var_archive)
-# x2 = np.linspace(1, steps2, steps2)
-# plt.plot(x2, var_archive)
-# plt.yscale('log')
-# plt.title('variances')
-# plt.savefig('variances.png')
-# #plt.show()
-# plt.close()
-
-
-# plt.figure()
-# for i in range(3):
-#     plt.subplot(1,3,i+1)
-#     key = list(parameters.keys())[i]
-#     #plt.hist([p[key] for p in solution_archive])
-#     plt.hist(np.log10([p[key] for p in solution_archive]), bins=100, range=np.log10(parameter_bounds[key]))
-#     #add vertical line for starter parameter values
-#     plt.axvline(np.log10(starter_parameters[key]), color='r', linewidth = 1)
-    
-# plt.title('parameter histograms')
-# plt.savefig('parameters.png')
-# #plt.show()
-# plt.close()
+with open('results.p', 'wb') as f:
+    pickle.dump(results, f)

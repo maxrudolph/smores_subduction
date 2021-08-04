@@ -9,24 +9,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pickle
 
+with open('results.p', 'rb') as f:
+    results = pickle.load(f)
+    
+residuals = results['residuals'] 
+solution_archive = results['parameters']
+variances = results['variances'] 
+starter_parameters = results['starter_parameters'] 
+parameter_bounds = results['bounds'] 
 
-#unpickle results of Bayesian inversion 
-with open('residuals.p', 'rb') as f1: 
-    residuals = pickle.load(f1)
-    
-with open('parameters.p', 'rb') as f2: 
-    solution_archive = pickle.load(f2)
-    
-with open('variances.p', 'rb') as f3:
-    variances = pickle.load(f3)
-    
-#unpickle parameters for starter model and 
-with open('starter_parameters.p', 'rb') as f4:
-    starter_parameters = pickle.load(f4)
-    
-with open('parameter_bounds.p', 'rb') as f5:
-    parameter_bounds = pickle.load(f5)
-    
 steps = len(residuals)
 x1 = np.linspace(1, steps, steps)
 plt.plot(x1, residuals)
