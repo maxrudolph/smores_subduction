@@ -203,8 +203,8 @@ starter_parameters['PREFACTOR2'] = 1.0657e-18
 
 
 #create starter.prm from starter_parameters
-run_aspect(parameters,'starter.prm')                
-observed_geoid = calculate_geoid('starter')
+run_aspect(starter_parameters,'boxslab_base.prm')                
+observed_geoid = calculate_geoid('boxslab_base')
 residual, solution_archive, var_archive = MCMC(parameters, parameter_bounds, observed_geoid)
 #%%
 

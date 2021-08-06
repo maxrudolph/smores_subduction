@@ -1,27 +1,55 @@
 -----------------------------------------------------------------------------
 -- This is ASPECT, the Advanced Solver for Problems in Earth's ConvecTion.
---     . version 2.4.0-pre (master, 172651c82)
---     . using deal.II 9.2.0
+--     . version 2.4.0-pre (master, ea1c999bf)
+--     . using deal.II 9.3.1
 --     .       with 32 bit indices and vectorization level 1 (128 bits)
 --     . using Trilinos 12.18.1
 --     . using p4est 2.2.0
 --     . running in OPTIMIZED mode
---     . running with 1 MPI process
+--     . running with 20 MPI processes
 -----------------------------------------------------------------------------
 
 -----------------------------------------------------------------------------
 -- For information on how to cite ASPECT, see:
---   https://aspect.geodynamics.org/citing.html?ver=2.4.0-pre&GWB=1&dg=1&sha=172651c82&src=code
+--   https://aspect.geodynamics.org/citing.html?ver=2.4.0-pre&GWB=1&dg=1&sha=ea1c999bf&src=code
 -----------------------------------------------------------------------------
 Number of active cells: 1,536 (on 5 levels)
 Number of degrees of freedom: 48,180 (12,610+1,617+6,305+13,824+13,824)
 
 *** Timestep 0:  t=0 years, dt=0 years
    Rebuilding Stokes preconditioner...
-   Solving Stokes system... 104+0 iterations.
+   Solving Stokes system... 92+0 iterations.
+
+Number of active cells: 2,445 (on 6 levels)
+Number of degrees of freedom: 77,505 (20,578+2,628+10,289+22,005+22,005)
+
+*** Timestep 0:  t=0 years, dt=0 years
+   Rebuilding Stokes preconditioner...
+   Solving Stokes system... 200+18 iterations.
+
+Number of active cells: 4,932 (on 7 levels)
+Number of degrees of freedom: 157,946 (42,514+5,399+21,257+44,388+44,388)
+
+*** Timestep 0:  t=0 years, dt=0 years
+   Rebuilding Stokes preconditioner...
+   Solving Stokes system... 200+30 iterations.
+
+Number of active cells: 11,091 (on 8 levels)
+Number of degrees of freedom: 356,237 (96,284+12,173+48,142+99,819+99,819)
+
+*** Timestep 0:  t=0 years, dt=0 years
+   Rebuilding Stokes preconditioner...
+   Solving Stokes system... 200+36 iterations.
+
+Number of active cells: 23,757 (on 9 levels)
+Number of degrees of freedom: 767,518 (209,018+26,365+104,509+213,813+213,813)
+
+*** Timestep 0:  t=0 years, dt=0 years
+   Rebuilding Stokes preconditioner...
+   Solving Stokes system... 200+45 iterations.
 
    Postprocessing:
-     Pressure at top/bottom of domain: -2.493e-06 Pa, 1.005e+11 Pa
+     Pressure at top/bottom of domain: 3.003e-06 Pa, 1.005e+11 Pa
      Computing dynamic topography      
      Writing graphical output:         starter/solution/solution-00000
 
@@ -29,21 +57,23 @@ Termination requested by criterion: end time
 
 
 +---------------------------------------------+------------+------------+
-| Total wallclock time elapsed since start    |      1.63s |            |
+| Total wallclock time elapsed since start    |      24.5s |            |
 |                                             |            |            |
 | Section                         | no. calls |  wall time | % of total |
 +---------------------------------+-----------+------------+------------+
-| Assemble Stokes system          |         1 |     0.119s |       7.3% |
-| Build Stokes preconditioner     |         1 |     0.138s |       8.5% |
-| Initialization                  |         1 |       0.2s |        12% |
-| Postprocessing                  |         1 |       0.2s |        12% |
-| Setup dof systems               |         1 |    0.0185s |       1.1% |
-| Setup initial conditions        |         1 |     0.231s |        14% |
-| Setup matrices                  |         1 |     0.119s |       7.3% |
-| Solve Stokes system             |         1 |     0.533s |        33% |
+| Assemble Stokes system          |         5 |     0.192s |      0.78% |
+| Build Stokes preconditioner     |         5 |     0.272s |       1.1% |
+| Initialization                  |         1 |     0.158s |      0.64% |
+| Postprocessing                  |         1 |     0.205s |      0.84% |
+| Refine mesh structure, part 1   |         4 |     0.282s |       1.1% |
+| Refine mesh structure, part 2   |         4 |    0.0444s |      0.18% |
+| Setup dof systems               |         5 |    0.0931s |      0.38% |
+| Setup initial conditions        |         5 |     0.837s |       3.4% |
+| Setup matrices                  |         5 |     0.398s |       1.6% |
+| Solve Stokes system             |         5 |        22s |        90% |
 +---------------------------------+-----------+------------+------------+
 
 -----------------------------------------------------------------------------
 -- For information on how to cite ASPECT, see:
---   https://aspect.geodynamics.org/citing.html?ver=2.4.0-pre&GWB=1&dg=1&sha=172651c82&src=code
+--   https://aspect.geodynamics.org/citing.html?ver=2.4.0-pre&GWB=1&dg=1&sha=ea1c999bf&src=code
 -----------------------------------------------------------------------------

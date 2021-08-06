@@ -9,7 +9,7 @@ set End time 								= 0
 set Pressure normalization                  = surface
 set Surface pressure                       	= 0  
 set Adiabatic surface temperature 	 		= 273
-set Output directory 						= starter
+set Output directory 						= boxslab_base
 set Nonlinear solver scheme 				= no Advection, single Stokes
 set World builder file 						= boxslab_topcrust.wb
 

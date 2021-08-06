@@ -6976,24 +6976,42 @@ subsection Material model
   end
 
   subsection Steinberger model
+    # Whether there is a background compositional field.
+    set Background material                              = true
+
     # Whether to use bilinear interpolation to compute material properties
     # (slower but more accurate).
-    set Bilinear interpolation                        = true
+    set Bilinear interpolation                           = true
 
     # The path to the model data. The path may also include the special text
     # '$ASPECT_SOURCE_DIR' which will be interpreted as the path in which the
     # ASPECT source files were located when ASPECT was compiled. This
     # interpretation allows, for example, to reference files located in the
     # `data/' subdirectory of ASPECT.
-    set Data directory                                = $ASPECT_SOURCE_DIR/data/material-model/steinberger/
+    set Data directory                                   = $ASPECT_SOURCE_DIR/data/material-model/steinberger/
+
+    # The file names of the enthalpy derivatives data. List with as many
+    # components as active compositional fields (material data is assumed to
+    # be in order with the ordering of the fields).
+    set Derivatives file names                           = 
+
+    # The index of the first compositional field which corresponds to the mass
+    # fraction of a material. The indexing starts at 0.
+    set Index of first mass fraction compositional field = 0
 
     # Whether to include latent heat effects in the calculation of thermal
-    # expansivity and specific heat. Following the approach of Nakagawa et al.
-    # 2009.
-    set Latent heat                                   = false
+    # expansivity and specific heat. If true, ASPECT follows the approach of
+    # Nakagawa et al. 2009, using pressure and temperature derivatives of the
+    # enthalpy to calculate the thermal expansivity and specific heat. If
+    # false, ASPECT uses the thermal expansivity and specific heat values from
+    # the material properties table.
+    set Latent heat                                      = false
 
     # The file name of the lateral viscosity data.
-    set Lateral viscosity file name                   = temp-viscosity-prefactor.txt
+    set Lateral viscosity file name                      = temp-viscosity-prefactor.txt
+
+    # The material file format to be read in the property tables.
+    set Material file format                             = perplex
 
     # The file names of the material data (material data is assumed to be in
     # order with the ordering of the compositional fields). Note that there
@@ -7003,29 +7021,33 @@ subsection Material model
     # the number of compositional fields, then the first file is assumed to
     # define a `background composition' that is modified by the compositional
     # fields. If there are exactly as many files as compositional fields, the
-    # fields are assumed to represent the mass fractions of different
-    # materials and the average property is computed as a sum of the value of
-    # the compositional field times the material property of that field.
-    set Material file names                           = pyr-ringwood88.txt
+    # fields are assumed to represent the fractions of different materials and
+    # the average property is computed as a sum of the value of the
+    # compositional field times the material property of that field.
+    set Material file names                              = pyr-ringwood88.txt
+
+    # The maximum number of substeps over the temperature pressure range to
+    # calculate the averaged enthalpy gradient over a cell.
+    set Maximum latent heat substeps                     = 1
 
     # The relative cutoff value for lateral viscosity variations caused by
     # temperature deviations. The viscosity may vary laterally by this factor
     # squared.
-    set Maximum lateral viscosity variation           = 1e2
+    set Maximum lateral viscosity variation              = 1e2
 
     # The maximum viscosity that is allowed in the viscosity calculation.
     # Larger values will be cut off.
-    set Maximum viscosity                             = 1e23
+    set Maximum viscosity                                = 1e23
 
     # The minimum viscosity that is allowed in the viscosity calculation.
     # Smaller values will be cut off.
-    set Minimum viscosity                             = 1e19
+    set Minimum viscosity                                = 1e19
 
     # Number of bands to compute laterally averaged temperature within.
-    set Number lateral average bands                  = 10
+    set Number lateral average bands                     = 10
 
     # The file name of the radial viscosity data.
-    set Radial viscosity file name                    = radial-visc.txt
+    set Radial viscosity file name                       = radial-visc.txt
 
     # The reference viscosity that is used for pressure scaling. To understand
     # how pressure scaling works, take a look at \cite{KHB12}. In particular,
@@ -7045,18 +7067,18 @@ subsection Material model
     # use to compute a Rayleigh number.
     # 
     # Units: \si{\pascal\second}.
-    set Reference viscosity                           = 1e23
+    set Reference viscosity                              = 1e23
 
     # The value of the thermal conductivity $k$. Units:
     # \si{\watt\per\meter\per\kelvin}.
-    set Thermal conductivity                          = 4.7
+    set Thermal conductivity                             = 4.7
 
     # Whether to use to use the laterally averaged temperature instead of the
     # adiabatic temperature as reference for the viscosity calculation. This
     # ensures that the laterally averaged viscosities remain more or less
     # constant over the model runtime. This behaviour might or might not be
     # desired.
-    set Use lateral average temperature for viscosity = true
+    set Use lateral average temperature for viscosity    = true
   end
 
   subsection Visco Plastic
@@ -7155,6 +7177,10 @@ subsection Material model
     # M is the number of phases. If only one value is given, then all use the
     # same value. Units: \si{\kilogram\per\meter\cubed}.
     set Densities                                          = background:3227.0|3473|3943.0, spcrust:3000.0|3540.0|3943.0, ovcrust:3000.0                               # default: 3300.
+
+    # Viscosity of a viscous damper that acts in parallel with the elastic
+    # element to stabilize behavior. Units: \si{\pascal\second}
+    set Elastic damper viscosity                           = 0.0
 
     # List of elastic shear moduli, $G$, for background material and
     # compositional fields, for a total of N+1 values, where N is the number
@@ -7561,6 +7587,10 @@ subsection Material model
     # same value. Units: \si{\kilogram\per\meter\cubed}.
     set Densities                       = 3300.
 
+    # Viscosity of a viscous damper that acts in parallel with the elastic
+    # element to stabilize behavior. Units: \si{\pascal\second}
+    set Elastic damper viscosity        = 0.0
+
     # List of elastic shear moduli, $G$, for background material and
     # compositional fields, for a total of N+1 values, where N is the number
     # of compositional fields. The default value of 75 GPa is representative
@@ -7894,7 +7924,7 @@ subsection Mesh refinement
   # refinement but while still within the first time step. These refinement
   # steps (n) are added to the value for initial global refinement (m) so that
   # the final mesh has cells that are at most on refinement level $n+m$.
-  set Initial adaptive refinement                         = 0
+  set Initial adaptive refinement                         = 4                                                                            # default: 0
 
   # The number of global refinement steps performed on the initial coarse
   # mesh, before the problem is first solved there.
@@ -9167,8 +9197,9 @@ subsection Postprocess
   subsection Particles
     # By default, every cell needs to contain particles to use this
     # interpolator plugin. If this parameter is set to true, cells are allowed
-    # to have no particles, in which case the interpolator will return 0 for
-    # the cell's properties.
+    # to have no particles. In case both the current cell and its neighbors
+    # are empty, the interpolator will return 0 for the current cell's
+    # properties.
     set Allow cells without particles = false
 
     # A comma separated list of file formats to be used for graphical output.
@@ -9243,15 +9274,23 @@ subsection Postprocess
     # be configured with BLAS and LAPACK to support this operation.
     # 
     # `cell average': Return the arithmetic average of all particle properties
-    # in the given cell.
+    # in the given cell, or in the neighboring cells if the given cell is
+    # empty. In case the neighboring cells are also empty, and 'Allow cells
+    # without particles' is set to true, the interpolator returns 0.
+    # Otherwise, an exception is thrown.
     # 
     # `harmonic average': Return the harmonic average of all particle
     # properties in the given cell. If the cell contains no particles, return
-    # the harmonic average of the properties in the neighboring cells.
+    # the harmonic average of the properties in the neighboring cells. In case
+    # the neighboring cells are also empty, and 'Allow cells without
+    # particles' is set to true, the interpolator returns 0. Otherwise, an
+    # exception is thrown.
     # 
     # `nearest neighbor': Return the properties of the nearest neighboring
     # particle in the current cell, or nearest particle in nearest neighboring
-    # cell if current cell is empty.
+    # cell if current cell is empty. In case the neighboring cells are also
+    # empty, and 'Allow cells without particles' is set to true, the
+    # interpolator returns 0. Otherwise, an exception is thrown.
     # 
     # `quadratic least squares': Interpolates particle properties onto a
     # vector of points using a quadratic least squares method. Note that
@@ -9978,6 +10017,13 @@ subsection Postprocess
     # The current postprocessor allows to output a (potentially large) subset
     # of all of the information provided by material models at once, with just
     # a single material model evaluation per output point.
+    # 
+    # In almost all places inside \aspect{}, the program can use ``averaged''
+    # material properties, for example for the assembly of matrices and right
+    # hand side vectors. To accurately reflect the material parameters used
+    # internally, this visualization postprocessor averages in the same way as
+    # is used to do the assembly, and consequently the graphical output will
+    # reflect not pointwise properties, but averaged properties.
     # 
     # `maximum horizontal compressive stress': A plugin that computes the
     # direction and magnitude of the maximum horizontal component of the
@@ -10855,6 +10901,12 @@ subsection Solver parameters
     # of diffusivity and time in the diffusion equation, and controls the
     # distance over which features are diffused. Units: \si{\meter}.
     set Diffusion length scale = 1.e4
+  end
+
+  subsection Matrix Free
+    # Turns on extra information for the matrix free GMG solver to be
+    # printed.
+    set Output details = false
   end
 
   subsection Newton solver parameters

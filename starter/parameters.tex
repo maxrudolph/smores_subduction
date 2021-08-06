@@ -14205,6 +14205,23 @@ This parameter is an alias for the parameter ``\texttt{Heat capacities}''.
 \label{parameters:Material_20model/Steinberger_20model}
 
 \begin{itemize}
+\item {\it Parameter name:} {\tt Background material}
+\phantomsection\label{parameters:Material model/Steinberger model/Background material}
+\label{parameters:Material_20model/Steinberger_20model/Background_20material}
+
+
+\index[prmindex]{Background material}
+\index[prmindexfull]{Material model!Steinberger model!Background material}
+{\it Value:} true
+
+
+{\it Default:} true
+
+
+{\it Description:} Whether there is a background compositional field.
+
+
+{\it Possible values:} A boolean value (true or false)
 \item {\it Parameter name:} {\tt Bilinear interpolation}
 \phantomsection\label{parameters:Material model/Steinberger model/Bilinear interpolation}
 \label{parameters:Material_20model/Steinberger_20model/Bilinear_20interpolation}
@@ -14239,6 +14256,40 @@ This parameter is an alias for the parameter ``\texttt{Heat capacities}''.
 
 
 {\it Possible values:} A directory name
+\item {\it Parameter name:} {\tt Derivatives file names}
+\phantomsection\label{parameters:Material model/Steinberger model/Derivatives file names}
+\label{parameters:Material_20model/Steinberger_20model/Derivatives_20file_20names}
+
+
+\index[prmindex]{Derivatives file names}
+\index[prmindexfull]{Material model!Steinberger model!Derivatives file names}
+{\it Value:} 
+
+
+{\it Default:} 
+
+
+{\it Description:} The file names of the enthalpy derivatives data. List with as many components as active compositional fields (material data is assumed to be in order with the ordering of the fields).
+
+
+{\it Possible values:} A list of 0 to 4294967295 elements where each element is [Any string]
+\item {\it Parameter name:} {\tt Index of first mass fraction compositional field}
+\phantomsection\label{parameters:Material model/Steinberger model/Index of first mass fraction compositional field}
+\label{parameters:Material_20model/Steinberger_20model/Index_20of_20first_20mass_20fraction_20compositional_20field}
+
+
+\index[prmindex]{Index of first mass fraction compositional field}
+\index[prmindexfull]{Material model!Steinberger model!Index of first mass fraction compositional field}
+{\it Value:} 0
+
+
+{\it Default:} 0
+
+
+{\it Description:} The index of the first compositional field which corresponds to the mass fraction of a material. The indexing starts at 0.
+
+
+{\it Possible values:} An integer $n$ such that $0\leq n \leq 2147483647$
 \item {\it Parameter name:} {\tt Latent heat}
 \phantomsection\label{parameters:Material model/Steinberger model/Latent heat}
 \label{parameters:Material_20model/Steinberger_20model/Latent_20heat}
@@ -14252,7 +14303,7 @@ This parameter is an alias for the parameter ``\texttt{Heat capacities}''.
 {\it Default:} false
 
 
-{\it Description:} Whether to include latent heat effects in the calculation of thermal expansivity and specific heat. Following the approach of Nakagawa et al. 2009. 
+{\it Description:} Whether to include latent heat effects in the calculation of thermal expansivity and specific heat. If true, ASPECT follows the approach of Nakagawa et al. 2009, using pressure and temperature derivatives of the enthalpy to calculate the thermal expansivity and specific heat. If false, ASPECT uses the thermal expansivity and specific heat values from the material properties table.
 
 
 {\it Possible values:} A boolean value (true or false)
@@ -14273,6 +14324,23 @@ This parameter is an alias for the parameter ``\texttt{Heat capacities}''.
 
 
 {\it Possible values:} Any string
+\item {\it Parameter name:} {\tt Material file format}
+\phantomsection\label{parameters:Material model/Steinberger model/Material file format}
+\label{parameters:Material_20model/Steinberger_20model/Material_20file_20format}
+
+
+\index[prmindex]{Material file format}
+\index[prmindexfull]{Material model!Steinberger model!Material file format}
+{\it Value:} perplex
+
+
+{\it Default:} perplex
+
+
+{\it Description:} The material file format to be read in the property tables.
+
+
+{\it Possible values:} Any one of perplex, hefesto
 \item {\it Parameter name:} {\tt Material file names}
 \phantomsection\label{parameters:Material model/Steinberger model/Material file names}
 \label{parameters:Material_20model/Steinberger_20model/Material_20file_20names}
@@ -14286,10 +14354,27 @@ This parameter is an alias for the parameter ``\texttt{Heat capacities}''.
 {\it Default:} pyr-ringwood88.txt
 
 
-{\it Description:} The file names of the material data (material data is assumed to be in order with the ordering of the compositional fields). Note that there are three options on how many files need to be listed here: 1. If only one file is provided, it is used for the whole model domain, and compositional fields are ignored. 2. If there is one more file name than the number of compositional fields, then the first file is assumed to define a `background composition' that is modified by the compositional fields. If there are exactly as many files as compositional fields, the fields are assumed to represent the mass fractions of different materials and the average property is computed as a sum of the value of the compositional field times the material property of that field.
+{\it Description:} The file names of the material data (material data is assumed to be in order with the ordering of the compositional fields). Note that there are three options on how many files need to be listed here: 1. If only one file is provided, it is used for the whole model domain, and compositional fields are ignored. 2. If there is one more file name than the number of compositional fields, then the first file is assumed to define a `background composition' that is modified by the compositional fields. If there are exactly as many files as compositional fields, the fields are assumed to represent the fractions of different materials and the average property is computed as a sum of the value of the compositional field times the material property of that field.
 
 
 {\it Possible values:} A list of 0 to 4294967295 elements where each element is [Any string]
+\item {\it Parameter name:} {\tt Maximum latent heat substeps}
+\phantomsection\label{parameters:Material model/Steinberger model/Maximum latent heat substeps}
+\label{parameters:Material_20model/Steinberger_20model/Maximum_20latent_20heat_20substeps}
+
+
+\index[prmindex]{Maximum latent heat substeps}
+\index[prmindexfull]{Material model!Steinberger model!Maximum latent heat substeps}
+{\it Value:} 1
+
+
+{\it Default:} 1
+
+
+{\it Description:} The maximum number of substeps over the temperature pressure range to calculate the averaged enthalpy gradient over a cell.
+
+
+{\it Possible values:} An integer $n$ such that $1\leq n \leq 2147483647$
 \item {\it Parameter name:} {\tt Maximum lateral viscosity variation}
 \phantomsection\label{parameters:Material model/Steinberger model/Maximum lateral viscosity variation}
 \label{parameters:Material_20model/Steinberger_20model/Maximum_20lateral_20viscosity_20variation}
@@ -14691,6 +14776,23 @@ Units: \si{\pascal\second}.
 
 
 {\it Possible values:} Any string
+\item {\it Parameter name:} {\tt Elastic damper viscosity}
+\phantomsection\label{parameters:Material model/Visco Plastic/Elastic damper viscosity}
+\label{parameters:Material_20model/Visco_20Plastic/Elastic_20damper_20viscosity}
+
+
+\index[prmindex]{Elastic damper viscosity}
+\index[prmindexfull]{Material model!Visco Plastic!Elastic damper viscosity}
+{\it Value:} 0.0
+
+
+{\it Default:} 0.0
+
+
+{\it Description:} Viscosity of a viscous damper that acts in parallel with the elastic element to stabilize behavior. Units: \si{\pascal\second}
+
+
+{\it Possible values:} A floating point number $v$ such that $0 \leq v \leq \text{MAX\_DOUBLE}$
 \item {\it Parameter name:} {\tt Elastic shear moduli}
 \phantomsection\label{parameters:Material model/Visco Plastic/Elastic shear moduli}
 \label{parameters:Material_20model/Visco_20Plastic/Elastic_20shear_20moduli}
@@ -15719,6 +15821,23 @@ If a compositional field named 'noninitial\_plastic\_strain' is included in the 
 
 
 {\it Possible values:} Any string
+\item {\it Parameter name:} {\tt Elastic damper viscosity}
+\phantomsection\label{parameters:Material model/Viscoelastic/Elastic damper viscosity}
+\label{parameters:Material_20model/Viscoelastic/Elastic_20damper_20viscosity}
+
+
+\index[prmindex]{Elastic damper viscosity}
+\index[prmindexfull]{Material model!Viscoelastic!Elastic damper viscosity}
+{\it Value:} 0.0
+
+
+{\it Default:} 0.0
+
+
+{\it Description:} Viscosity of a viscous damper that acts in parallel with the elastic element to stabilize behavior. Units: \si{\pascal\second}
+
+
+{\it Possible values:} A floating point number $v$ such that $0 \leq v \leq \text{MAX\_DOUBLE}$
 \item {\it Parameter name:} {\tt Elastic shear moduli}
 \phantomsection\label{parameters:Material model/Viscoelastic/Elastic shear moduli}
 \label{parameters:Material_20model/Viscoelastic/Elastic_20shear_20moduli}
@@ -16327,7 +16446,7 @@ If the function you are describing represents a vector-valued function with mult
 
 \index[prmindex]{Initial adaptive refinement}
 \index[prmindexfull]{Mesh refinement!Initial adaptive refinement}
-{\it Value:} 0
+{\it Value:} 4
 
 
 {\it Default:} 0
@@ -18106,7 +18225,7 @@ all|temperature|composition|adiabatic temperature|adiabatic pressure|adiabatic d
 {\it Default:} false
 
 
-{\it Description:} By default, every cell needs to contain particles to use this interpolator plugin. If this parameter is set to true, cells are allowed to have no particles, in which case the interpolator will return 0 for the cell's properties.
+{\it Description:} By default, every cell needs to contain particles to use this interpolator plugin. If this parameter is set to true, cells are allowed to have no particles. In case both the current cell and its neighbors are empty, the interpolator will return 0 for the current cell's properties.
 
 
 {\it Possible values:} A boolean value (true or false)
@@ -18190,11 +18309,11 @@ Select one of the following models:
 
 `bilinear least squares': Interpolates particle properties onto a vector of points using a bilinear least squares method. Note that deal.II must be configured with BLAS and LAPACK to support this operation.
 
-`cell average': Return the arithmetic average of all particle properties in the given cell.
+`cell average': Return the arithmetic average of all particle properties in the given cell, or in the neighboring cells if the given cell is empty. In case the neighboring cells are also empty, and 'Allow cells without particles' is set to true, the interpolator returns 0. Otherwise, an exception is thrown. 
 
-`harmonic average': Return the harmonic average of all particle properties in the given cell. If the cell contains no particles, return the harmonic average of the properties in the neighboring cells.
+`harmonic average': Return the harmonic average of all particle properties in the given cell. If the cell contains no particles, return the harmonic average of the properties in the neighboring cells. In case the neighboring cells are also empty, and 'Allow cells without particles' is set to true, the interpolator returns 0. Otherwise, an exception is thrown. 
 
-`nearest neighbor': Return the properties of the nearest neighboring particle in the current cell, or nearest particle in nearest neighboring cell if current cell is empty.
+`nearest neighbor': Return the properties of the nearest neighboring particle in the current cell, or nearest particle in nearest neighboring cell if current cell is empty. In case the neighboring cells are also empty, and 'Allow cells without particles' is set to true, the interpolator returns 0. Otherwise, an exception is thrown. 
 
 `quadratic least squares': Interpolates particle properties onto a vector of points using a quadratic least squares method. Note that deal.II must be configured with BLAS/LAPACK.
 
@@ -19354,6 +19473,8 @@ Alternatively, consider using the "surface dynamic topography" visualization pos
 `heating': A visualization output object that generates output for all the heating terms used in the energy equation.
 
 `material properties': A visualization output object that generates output for the material properties given by the material model.There are a number of other visualization postprocessors that offer to write individual material properties. However, they all individually have to evaluate the material model. This is inefficient if one wants to output more than just one or two of the fields provided by the material model. The current postprocessor allows to output a (potentially large) subset of all of the information provided by material models at once, with just a single material model evaluation per output point.
+
+In almost all places inside \aspect{}, the program can use ``averaged'' material properties, for example for the assembly of matrices and right hand side vectors. To accurately reflect the material parameters used internally, this visualization postprocessor averages in the same way as is used to do the assembly, and consequently the graphical output will reflect not pointwise properties, but averaged properties.
 
 `maximum horizontal compressive stress': A plugin that computes the direction and magnitude of the maximum horizontal component of the compressive stress as a vector field. The direction of this vector can often be used to visualize the principal mode of deformation (e.g., at normal faults or extensional margins) and can be correlated with seismic anisotropy. Recall that the \textit{compressive} stress is simply the negative stress, $\sigma_c=-\sigma=-\left[     2\eta (\varepsilon(\mathbf u)             - \frac 13 (\nabla \cdot \mathbf u) I)     + pI\right]$.
 
@@ -20782,6 +20903,29 @@ If the function you are describing represents a vector-valued function with mult
 
 
 {\it Possible values:} A floating point number $v$ such that $0 \leq v \leq \text{MAX\_DOUBLE}$
+\end{itemize}
+
+\subsection{Parameters in section \tt Solver parameters/Matrix Free}
+\label{parameters:Solver_20parameters/Matrix_20Free}
+
+\begin{itemize}
+\item {\it Parameter name:} {\tt Output details}
+\phantomsection\label{parameters:Solver parameters/Matrix Free/Output details}
+\label{parameters:Solver_20parameters/Matrix_20Free/Output_20details}
+
+
+\index[prmindex]{Output details}
+\index[prmindexfull]{Solver parameters!Matrix Free!Output details}
+{\it Value:} false
+
+
+{\it Default:} false
+
+
+{\it Description:} Turns on extra information for the matrix free GMG solver to be printed.
+
+
+{\it Possible values:} A boolean value (true or false)
 \end{itemize}
 
 \subsection{Parameters in section \tt Solver parameters/Newton solver parameters}
