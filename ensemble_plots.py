@@ -14,6 +14,7 @@ with open('results.p', 'rb') as f:
     
 residuals = results['residuals'] 
 solution_archive = results['parameters']
+geoid_archive = results['geoids']
 variances = results['variances'] 
 starter_parameters = results['starter_parameters'] 
 parameter_bounds = results['bounds'] 
@@ -50,3 +51,20 @@ for i in range(parameter_count):
 plt.suptitle('parameter histograms')
 plt.savefig('parameters.png')
 plt.show()
+
+#pull individual parameter values
+parameters_stepwise = dict()
+for i in range(parameter_count):
+    key = list(starter_parameters.keys())[i]
+    current_parameters = []
+    for p in solution_archive: 
+        current_parameters.append(p[key])
+    parameters_stepwise[key] = current_parameters
+    
+prefactor0 = parameters_stepwise['PREFACTOR0']
+prefactor1 = parameters_stepwise['PREFACTOR1']
+
+plt.hist2d(prefactor0, prefactor1, bins=(100, 100), cmap=plt.cm.jet)
+plt.colorbar()
+plt.show()
+

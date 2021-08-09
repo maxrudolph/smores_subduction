@@ -9,12 +9,15 @@ import numpy as np
 import subprocess
 import matplotlib.pyplot as plt
 import pickle
+import binascii
+import os
 from geoid_functions import *
 from copy import deepcopy
 
 def setup_aspect_runs(run_dir='/dev/shm/geoidtmp/',base_input_file='boxslab_base.prm'):
     # make the run directory:
     try:
+        run_dir = run_dir[:-1] + binascii.hexlify(os.urandom(8)).decode() + '/'
         subprocess.run(['mkdir',run_dir[:-1]])
     except:
         print('run directory '+run_dir+' already exists or cannot be created')        
@@ -63,7 +66,7 @@ def calculate_geoid(output_folder,run_dir='./'):
     N_total = N_surface + N_interior + N_cmb
     return N_total
 
-def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_steps=2000,save_start=1000,save_skip=2,var=None):
+def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_steps=100,save_start=0,save_skip=2,var=None):
     # This function should implement the MCMC procedure
     # 1. Define the perturbations (proposal distributions) for each parameter
     #    and the bounds on each parameter. Define the total number of steps and
@@ -93,6 +96,7 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
     #create ensemble archive
     ensemble_residual = []
     solution_archive = []
+    geoid_archive = []
     var_archive = []
 
     # 3. Begin the MCMC procedure
@@ -174,13 +178,13 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
         
         if iter > save_start and not (iter % save_skip):    
             solution_archive.append(deepcopy(accepted_solution))
-            
+            geoid_archive.append(deepcopy(proposed_geoid))
             # save the accepted solution to the archive
             # also save the accepted_var
             # also save the likelihood of the accepted solution
             # also save the misfit of the accepted solution
             pass                        
-    return ensemble_residual, solution_archive, var_archive# return the solution archive - this is the ensemble!
+    return ensemble_residual, solution_archive, var_archive, geoid_archive# return the solution archive - this is the ensemble!
 
 
 #def main():
@@ -189,23 +193,32 @@ parameters = dict()
 parameters['PREFACTOR0'] = 2e-15#1.4250e-15 
 parameters['PREFACTOR1'] = 1e-15 #1.4250e-15
 parameters['PREFACTOR2'] = 3e-18#1.0657e-18
+parameters['PREFACTOR3'] = 0.7e-20#0.5e-20
+parameters['PREFACTOR4'] = 1.5e-15#1.4250e-15
+parameters['PREFACTOR5'] = 0.8e-18#1.0657e-18
+
 
 parameter_bounds = dict()
 #add third number for amplitude of pertubation
 parameter_bounds['PREFACTOR0'] = [1.425e-16, 1.425e-14]
 parameter_bounds['PREFACTOR1'] = [1.425e-16, 1.425e-14]
 parameter_bounds['PREFACTOR2'] = [1.0657e-19, 1.0657e-17]
+parameter_bounds['PREFACTOR3'] = [0.5e-21, 0.5e-19]
+parameter_bounds['PREFACTOR4'] = [1.425e-16, 1.425e-14]
+parameter_bounds['PREFACTOR5'] = [1.0657e-19, 1.0657e-17]
 
 starter_parameters = dict()
 starter_parameters['PREFACTOR0'] = 1.4250e-15 
 starter_parameters['PREFACTOR1'] = 1.4250e-15
 starter_parameters['PREFACTOR2'] = 1.0657e-18
-
+starter_parameters['PREFACTOR3'] = 0.5e-20
+starter_parameters['PREFACTOR4'] = 1.4250e-15
+starter_parameters['PREFACTOR5'] = 1.0657e-18
 
 #create starter.prm from starter_parameters
 run_aspect(starter_parameters,'boxslab_base.prm')                
 observed_geoid = calculate_geoid('boxslab_base')
-residual, solution_archive, var_archive = MCMC(parameters, parameter_bounds, observed_geoid)
+residual, solution_archive, var_archive, geoid_archive = MCMC(parameters, parameter_bounds, observed_geoid)
 #%%
 
 
@@ -215,6 +228,7 @@ residual, solution_archive, var_archive = MCMC(parameters, parameter_bounds, obs
 results = dict()
 results['residuals'] = residual
 results['parameters'] = solution_archive
+results['geoids'] = geoid_archive
 results['variances'] = var_archive
 results['starter_parameters'] = starter_parameters
 results['bounds'] = parameter_bounds

@@ -89,7 +89,7 @@ def get_observation_vector(x,y,use_nodes=False):
         obs_x = x[ind_surf][:,None]
         obs_y = y[ind_surf][:,None]
     else:
-        obs_x = np.linspace(x.min(),x.max(),101)[:,None]
+        obs_x = np.linspace(x.min()+4.5e5,x.max()-4.5e5,101)[:,None]
         obs_y = y.max()*np.ones_like(obs_x)
     return obs_x,obs_y
 

@@ -112,7 +112,7 @@ subsection Material model
 #        set Prefactors for diffusion creep = background:1.4250e-15|1.4250e-15|1.0657e-18, \
 #        	spcrust:0.5e-20|1.4250e-15|1.0657e-18, ovcrust:0.5e-20
         set Prefactors for diffusion creep = background:PREFACTOR0|PREFACTOR1|PREFACTOR2, \
-        	spcrust:0.5e-20|1.4250e-15|1.0657e-18, ovcrust:0.5e-20
+        	spcrust:PREFACTOR3|PREFACTOR4|PREFACTOR5, ovcrust:PREFACTOR3
 
 
         set Grain size exponents for diffusion creep = background:3.0000e+00, \
