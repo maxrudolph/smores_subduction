@@ -40,7 +40,7 @@ plt.close()
 
 
 parameter_count = len(starter_parameters)
-fig, axs = plt.subplots(1, parameter_count, constrained_layout=True)
+fig, axs = plt.subplots(1, parameter_count, constrained_layout=True, figsize=(10,3))
 for i in range(parameter_count):
     key = list(starter_parameters.keys())[i]
     axs[i].hist(np.log10([p[key] for p in solution_archive]), bins=100, range=np.log10(parameter_bounds[key]))
@@ -53,6 +53,7 @@ plt.savefig('parameters.png')
 plt.show()
 
 #pull individual parameter values
+parameter_count = len(starter_parameters)
 parameters_stepwise = dict()
 for i in range(parameter_count):
     key = list(starter_parameters.keys())[i]
@@ -61,10 +62,23 @@ for i in range(parameter_count):
         current_parameters.append(p[key])
     parameters_stepwise[key] = current_parameters
     
+#log scale these later
 prefactor0 = parameters_stepwise['PREFACTOR0']
 prefactor1 = parameters_stepwise['PREFACTOR1']
 
-plt.hist2d(prefactor0, prefactor1, bins=(100, 100), cmap=plt.cm.jet)
-plt.colorbar()
-plt.show()
+#bounds = [np.log10(parameter_bounds['PREFACTOR0']), np.log10(parameter_bounds['PREFACTOR1'])]
+fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(8, 8))
+ax1.hist(prefactor0, bins = 50) # ,  range = bounds[0])
+#ax1.axvline(starter_parameters['PREFACTOR0'], color='r', linewidth = 1)
+x_axis = ax1.axes.get_xaxis()
+x_axis.set_ticklabels([[]])
 
+ax2.axis('off')
+
+ax3.hist2d(prefactor0, prefactor1, bins=50) #, range = bounds)
+ax3.set
+
+ax4.hist(prefactor1, bins = 50, orientation=u'horizontal')
+ax4.axhline(starter_parameters['PREFACTOR1'], color='r', linewidth = 1)
+y_axis = ax4.axes.get_yaxis()
+y_axis.set_ticklabels([])

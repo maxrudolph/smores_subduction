@@ -11,8 +11,17 @@ import matplotlib.pyplot as plt
 import pickle
 import binascii
 import os
+import sys
 from geoid_functions import *
 from copy import deepcopy
+
+#accept inputs if 3 numbers are given, otherwise use default
+#Usage: python3 aspect_geoid_mcmc.py n_steps save_start save_skip
+if len(sys.argv) == 4: 
+    n_steps = int(sys.argv[1]) #need try/catch?
+    save_start = int(sys.argv[2])
+    save_skip = int(sys.argv[3])
+    
 
 def setup_aspect_runs(run_dir='/dev/shm/geoidtmp/',base_input_file='boxslab_base.prm'):
     # make the run directory:
@@ -22,8 +31,7 @@ def setup_aspect_runs(run_dir='/dev/shm/geoidtmp/',base_input_file='boxslab_base
     except:
         print('run directory '+run_dir+' already exists or cannot be created')        
     # copy the aspect executable to the run directory
-    subprocess.run(['cp','aspect-master.fast',run_dir])
-    #subprocess.run(['cp', 'aspect.fast', run_dir])
+    subprocess.run(['cp', 'aspect.fast', run_dir])
     subprocess.run(['cp',base_input_file,run_dir])
     subprocess.run(['cp','boxslab_topcrust.wb',run_dir])
     
@@ -43,11 +51,11 @@ def run_aspect(parameters,base_input_file = 'boxslab_base.prm',run_dir='./'):
         subprocess.run(["sed","-i","-e","s/"+key+"/"+'{:e}'.format(parameters[key])+"/g",prm_filename], cwd = run_dir)
 
     # run aspect
-    aspect_command = './aspect-master.fast' #+ prm_filename
-    subprocess.run([aspect_command, prm_filename],cwd=run_dir) # run aspect
+    #aspect_command = './aspect-master.fast' #+ prm_filename
+    #subprocess.run([aspect_command, prm_filename],cwd=run_dir) # run aspect
 
-    #aspect_command = './aspect.fast' 
-    #subprocess.run(['mpirun', '-n', '20', aspect_command, prm_filename],cwd=run_dir)
+    aspect_command = './aspect.fast' 
+    subprocess.run(['mpirun', '-n', '20', aspect_command, prm_filename],cwd=run_dir)
     
 def calculate_geoid(output_folder,run_dir='./'):
     # Do the geoid calculation
@@ -66,7 +74,7 @@ def calculate_geoid(output_folder,run_dir='./'):
     N_total = N_surface + N_interior + N_cmb
     return N_total
 
-def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_steps=100,save_start=0,save_skip=2,var=None):
+def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_steps=2000,save_start=1000,save_skip=1,var=None):
     # This function should implement the MCMC procedure
     # 1. Define the perturbations (proposal distributions) for each parameter
     #    and the bounds on each parameter. Define the total number of steps and
@@ -218,7 +226,7 @@ starter_parameters['PREFACTOR5'] = 1.0657e-18
 #create starter.prm from starter_parameters
 run_aspect(starter_parameters,'boxslab_base.prm')                
 observed_geoid = calculate_geoid('boxslab_base')
-residual, solution_archive, var_archive, geoid_archive = MCMC(parameters, parameter_bounds, observed_geoid)
+residual, solution_archive, var_archive, geoid_archive = MCMC(parameters, parameter_bounds, observed_geoid, n_steps, save_start, save_skip)
 #%%
 
 
