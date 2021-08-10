@@ -16,11 +16,16 @@ from geoid_functions import *
 from copy import deepcopy
 
 #accept inputs if 3 numbers are given, otherwise use default
-#Usage: python3 aspect_geoid_mcmc.py n_steps save_start save_skip
-if len(sys.argv) == 4: 
-    n_steps = int(sys.argv[1]) #need try/catch?
-    save_start = int(sys.argv[2])
-    save_skip = int(sys.argv[3])
+#Usage: python3 aspect_geoid_mcmc.py n_processors n_steps save_start save_skip
+if len(sys.argv) == 5: 
+    n_processors = sys.argv[1]
+    n_steps = int(sys.argv[2]) #need try/catch?
+    save_start = int(sys.argv[3])
+    save_skip = int(sys.argv[4])
+elif len(sys.argv) == 1:
+    pass 
+else: 
+    raise SystemExit("Usage: python3 aspect_geoid_mcmc.py n_processors n_steps save_start save_skip")
     
 
 def setup_aspect_runs(run_dir='/dev/shm/geoidtmp/',base_input_file='boxslab_base.prm'):
@@ -55,7 +60,7 @@ def run_aspect(parameters,base_input_file = 'boxslab_base.prm',run_dir='./'):
     #subprocess.run([aspect_command, prm_filename],cwd=run_dir) # run aspect
 
     aspect_command = './aspect.fast' 
-    subprocess.run(['mpirun', '-n', '20', aspect_command, prm_filename],cwd=run_dir)
+    subprocess.run(['mpirun', '-n', n_processors, aspect_command, prm_filename],cwd=run_dir)
     
 def calculate_geoid(output_folder,run_dir='./'):
     # Do the geoid calculation
