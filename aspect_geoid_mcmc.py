@@ -24,7 +24,7 @@ if len(sys.argv) == 5:
     save_skip = int(sys.argv[4])
 #if no inputs are given, run with default 
 elif len(sys.argv) == 1:
-    n_processors = 1
+    n_processors = '1'
     n_steps = 2000
     save_start = 1000
     save_skip = 1
@@ -204,6 +204,10 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
 
         #save results to pickle file every 100 steps and for the last step 
         if (iter % 100 == 0) or (iter == n_steps - 1):
+            #archive current accepted solution and variance 
+            results['accepted_solution'] = deepcopy(accepted_solution)
+            results['accepted_var'] = accepted_var
+            results['iteration'] = iter
             results['residuals'] = ensemble_residual
             results['parameters'] = solution_archive
             results['geoids'] = geoid_archive
