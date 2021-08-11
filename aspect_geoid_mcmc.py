@@ -196,7 +196,20 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
             # also save the accepted_var
             # also save the likelihood of the accepted solution
             # also save the misfit of the accepted solution
-            pass                        
+            pass    
+
+        #save results to pickle file every 100 steps and for the last step 
+        if (iter % 100 == 0) or (iter == n_steps - 1):
+            # results = dict()
+            results['residuals'] = ensemble_residual
+            results['parameters'] = solution_archive
+            results['geoids'] = geoid_archive
+            results['variances'] = var_archive
+            
+            with open('results.p', 'wb') as f:
+                pickle.dump(results, f)
+
+        
     return ensemble_residual, solution_archive, var_archive, geoid_archive# return the solution archive - this is the ensemble!
 
 
@@ -212,7 +225,6 @@ parameters['PREFACTOR5'] = 0.8e-18#1.0657e-18
 
 
 parameter_bounds = dict()
-#add third number for amplitude of pertubation
 parameter_bounds['PREFACTOR0'] = [1.425e-16, 1.425e-14]
 parameter_bounds['PREFACTOR1'] = [1.425e-16, 1.425e-14]
 parameter_bounds['PREFACTOR2'] = [1.0657e-19, 1.0657e-17]
@@ -228,6 +240,11 @@ starter_parameters['PREFACTOR3'] = 0.5e-20
 starter_parameters['PREFACTOR4'] = 1.4250e-15
 starter_parameters['PREFACTOR5'] = 1.0657e-18
 
+#initialize results dictionary
+results = dict()
+results['starter_parameters'] = starter_parameters
+results['bounds'] = parameter_bounds
+            
 #create starter.prm from starter_parameters
 run_aspect(starter_parameters,'boxslab_base.prm')                
 observed_geoid = calculate_geoid('boxslab_base')
@@ -235,16 +252,16 @@ residual, solution_archive, var_archive, geoid_archive = MCMC(parameters, parame
 #%%
 
 
-#save residual values, ensemble parameters, and variance archive to pickle files
-#save everything into one dictionary?
+#save residual values, ensemble parameters, and variance archive to dictionary
+#pickle results dictionary
 
-results = dict()
-results['residuals'] = residual
-results['parameters'] = solution_archive
-results['geoids'] = geoid_archive
-results['variances'] = var_archive
-results['starter_parameters'] = starter_parameters
-results['bounds'] = parameter_bounds
+# results = dict()
+# results['residuals'] = residual
+# results['parameters'] = solution_archive
+# results['geoids'] = geoid_archive
+# results['variances'] = var_archive
+# results['starter_parameters'] = starter_parameters
+# results['bounds'] = parameter_bounds
 
-with open('results.p', 'wb') as f:
-    pickle.dump(results, f)
+# with open('results.p', 'wb') as f:
+#     pickle.dump(results, f)
