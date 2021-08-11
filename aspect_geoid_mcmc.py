@@ -22,8 +22,12 @@ if len(sys.argv) == 5:
     n_steps = int(sys.argv[2]) #need try/catch?
     save_start = int(sys.argv[3])
     save_skip = int(sys.argv[4])
+#if no inputs are given, run with default 
 elif len(sys.argv) == 1:
-    pass 
+    n_processors = 1
+    n_steps = 2000
+    save_start = 1000
+    save_skip = 1
 else: 
     raise SystemExit("Usage: python3 aspect_geoid_mcmc.py n_processors n_steps save_start save_skip")
     
@@ -200,7 +204,6 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
 
         #save results to pickle file every 100 steps and for the last step 
         if (iter % 100 == 0) or (iter == n_steps - 1):
-            # results = dict()
             results['residuals'] = ensemble_residual
             results['parameters'] = solution_archive
             results['geoids'] = geoid_archive

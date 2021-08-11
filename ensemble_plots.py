@@ -28,7 +28,6 @@ plt.savefig('residuals.png')
 plt.show()
 plt.close()
 
-
 steps2 = len(variances)
 x2 = np.linspace(1, steps2, steps2)
 plt.plot(x2, variances)
