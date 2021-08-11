@@ -262,4 +262,5 @@ results['bounds'] = parameter_bounds
 #create starter.prm from starter_parameters
 run_aspect(starter_parameters,'boxslab_base.prm')
 observed_geoid = calculate_geoid('boxslab_base')
+
 residual, solution_archive, var_archive, geoid_archive = MCMC(parameters, parameter_bounds, observed_geoid, n_steps, save_start, save_skip)
