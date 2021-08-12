@@ -54,7 +54,7 @@ def cleanup(run_dir=None):
         except:
             print('could not remove run directory',run_dir)
     
-def run_aspect(parameters,base_input_file = 'boxslab_base.prm',run_dir='./'): 
+def run_aspect(parameters,base_input_file = 'boxslab_base.prm',run_dir='./', timeout = None): 
     
     #should remove previous output directory with same name
     #run as ls command before rm (be careful)
@@ -73,7 +73,7 @@ def run_aspect(parameters,base_input_file = 'boxslab_base.prm',run_dir='./'):
     aspect_command = './aspect.fast' 
     #timeout the aspect run after 100 seconds
     try:
-        subprocess.run(['mpirun', '-n', n_processors, aspect_command, prm_filename],cwd=run_dir, timeout=100)
+        subprocess.run(['mpirun', '-n', n_processors, aspect_command, prm_filename],cwd=run_dir, timeout=timeout)
     except subprocess.TimeoutExpired:
         print('\nProcess ran too long')
         return True
@@ -104,6 +104,7 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
     var_min = 1e-6
     var_max = 1e10
     var_change = 0.1
+    step_size = 0.1
         
     if var is None:
         accepted_var = 1
@@ -154,7 +155,7 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
             if(vary_parameter < n_options - 1):    
                 key = list(parameters.keys())[vary_parameter]
                 #print(key)
-                proposed_solution[key] = np.exp(np.log(proposed_solution[key]) + 0.1*np.random.randn())
+                proposed_solution[key] = np.exp(np.log(proposed_solution[key]) + step_size*np.random.randn())
                 #print(proposed_solution[key])
                 if proposed_solution[key] > parameter_bounds[key][1] or proposed_solution[key] < parameter_bounds[key][0]:
                     success = False
@@ -178,7 +179,7 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
             # ...
             # if n_tries > some threshold, we are stuck in an infinite loop. print an error message and exit.
         # Calculate the forward model for the proposed solution
-        timeout_check = run_aspect(proposed_solution, 'boxslab_base.prm', run_dir = run_dir)
+        timeout_check = run_aspect(proposed_solution, 'boxslab_base.prm', run_dir=run_dir, timeout=100) 
         print("step number" + str(iter))
         #if aspect timed out, continue without recalculating the geoid
         if(timeout_check == True):
