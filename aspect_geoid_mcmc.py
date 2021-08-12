@@ -64,8 +64,13 @@ def run_aspect(parameters,base_input_file = 'boxslab_base.prm',run_dir='./'):
     #subprocess.run([aspect_command, prm_filename],cwd=run_dir) # run aspect
 
     aspect_command = './aspect.fast' 
-    subprocess.run(['mpirun', '-n', n_processors, aspect_command, prm_filename],cwd=run_dir)
-    
+    #timeout the aspect run after 100 seconds
+    try:
+        subprocess.run(['mpirun', '-n', n_processors, aspect_command, prm_filename],cwd=run_dir, timeout=100)
+    except subprocess.TimeoutExpired:
+        print('\nProcess ran too long')
+        return True
+        
 def calculate_geoid(output_folder,run_dir='./'):
     # Do the geoid calculation
     mesh_file = run_dir + output_folder + '/solution/mesh-00000.h5'
@@ -117,7 +122,9 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
     var_archive = []
 
     # 3. Begin the MCMC procedure
-    for iter in range(n_steps):
+    iter = 0
+    while iter < n_steps:
+        iter += 1
         success = False
         n_tries = 0
         while( success is False and n_tries < 100):
@@ -164,7 +171,13 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
             # ...
             # if n_tries > some threshold, we are stuck in an infinite loop. print an error message and exit.
         # Calculate the forward model for the proposed solution
-        run_aspect(proposed_solution, 'boxslab_base.prm', run_dir = run_dir)
+        timeout_check = run_aspect(proposed_solution, 'boxslab_base.prm', run_dir = run_dir)
+        print("step number" + str(iter))
+        #if aspect timed out, continue without recalculating the geoid
+        if(timeout_check == True):
+            continue
+        
+
         # calculate the geoid from the aspect model.
         proposed_geoid = calculate_geoid('boxslab_base', run_dir=run_dir)
         # calculate the misfit
@@ -173,7 +186,6 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
         #print(proposed_magnitude)
         
         N = len(observed_geoid)
-        #Cd_hat = np.identity(N)
         
         log_alpha = N/2*((np.log(accepted_var)) - np.log(proposed_var)) \
             - 1/(2*proposed_var)*proposed_magnitude + 1/(2*accepted_var)*accepted_magnitude
