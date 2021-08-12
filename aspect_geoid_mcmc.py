@@ -47,6 +47,13 @@ def setup_aspect_runs(run_dir='/dev/shm/geoidtmp/',base_input_file='boxslab_base
     # return the directory in which aspect has been placed.
     return run_dir
 
+def cleanup(run_dir=None):
+    if run_dir is not None:
+        try:
+            subprocess.run(['rm','-rf',run_dir])
+        except:
+            print('could not remove run directory',run_dir)
+    
 def run_aspect(parameters,base_input_file = 'boxslab_base.prm',run_dir='./'): 
     
     #should remove previous output directory with same name
@@ -70,7 +77,7 @@ def run_aspect(parameters,base_input_file = 'boxslab_base.prm',run_dir='./'):
     except subprocess.TimeoutExpired:
         print('\nProcess ran too long')
         return True
-        
+ 
 def calculate_geoid(output_folder,run_dir='./'):
     # Do the geoid calculation
     mesh_file = run_dir + output_folder + '/solution/mesh-00000.h5'
@@ -88,7 +95,7 @@ def calculate_geoid(output_folder,run_dir='./'):
     N_total = N_surface + N_interior + N_cmb
     return N_total
 
-def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_steps=2000,save_start=1000,save_skip=1,var=None):
+def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_steps=10000,save_start=5000,save_skip=2,var=None):
     # This function should implement the MCMC procedure
     # 1. Define the perturbations (proposal distributions) for each parameter
     #    and the bounds on each parameter. Define the total number of steps and
@@ -175,8 +182,8 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
         print("step number" + str(iter))
         #if aspect timed out, continue without recalculating the geoid
         if(timeout_check == True):
+            iter -= 1 
             continue
-        
 
         # calculate the geoid from the aspect model.
         proposed_geoid = calculate_geoid('boxslab_base', run_dir=run_dir)
@@ -228,7 +235,7 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
             with open('results.p', 'wb') as f:
                 pickle.dump(results, f)
 
-        
+    cleanup(run_dir)
     return ensemble_residual, solution_archive, var_archive, geoid_archive# return the solution archive - this is the ensemble!
 
 
@@ -252,7 +259,7 @@ parameter_bounds['PREFACTOR4'] = [1.425e-16, 1.425e-14]
 parameter_bounds['PREFACTOR5'] = [1.0657e-19, 1.0657e-17]
 
 starter_parameters = dict()
-starter_parameters['PREFACTOR0'] = 1.4250e-15 
+starter_parameters['PREFACTOR0'] = 1.4250e-15
 starter_parameters['PREFACTOR1'] = 1.4250e-15
 starter_parameters['PREFACTOR2'] = 1.0657e-18
 starter_parameters['PREFACTOR3'] = 0.5e-20
@@ -265,22 +272,7 @@ results['starter_parameters'] = starter_parameters
 results['bounds'] = parameter_bounds
             
 #create starter.prm from starter_parameters
-run_aspect(starter_parameters,'boxslab_base.prm')                
+run_aspect(starter_parameters,'boxslab_base.prm')
 observed_geoid = calculate_geoid('boxslab_base')
+
 residual, solution_archive, var_archive, geoid_archive = MCMC(parameters, parameter_bounds, observed_geoid, n_steps, save_start, save_skip)
-#%%
-
-
-#save residual values, ensemble parameters, and variance archive to dictionary
-#pickle results dictionary
-
-# results = dict()
-# results['residuals'] = residual
-# results['parameters'] = solution_archive
-# results['geoids'] = geoid_archive
-# results['variances'] = var_archive
-# results['starter_parameters'] = starter_parameters
-# results['bounds'] = parameter_bounds
-
-# with open('results.p', 'wb') as f:
-#     pickle.dump(results, f)
