@@ -68,7 +68,7 @@ prefactor1 = parameters_stepwise['PREFACTOR1']
 #bounds = [np.log10(parameter_bounds['PREFACTOR0']), np.log10(parameter_bounds['PREFACTOR1'])]
 fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(8, 8))
 ax1.hist(prefactor0, bins = 50) # ,  range = bounds[0])
-#ax1.axvline(starter_parameters['PREFACTOR0'], color='r', linewidth = 1)
+ax1.axvline(starter_parameters['PREFACTOR0'], color='r', linewidth = 1)
 x_axis = ax1.axes.get_xaxis()
 x_axis.set_ticklabels([[]])
 

@@ -16,20 +16,29 @@ from geoid_functions import *
 from copy import deepcopy
 
 #accept inputs if 3 numbers are given, otherwise use default
-#Usage: python3 aspect_geoid_mcmc.py n_processors n_steps save_start save_skip
-if len(sys.argv) == 5: 
+#Usage: python3 aspect_geoid_mcmc.py n_processors n_steps save_start save_skip resume_computation
+if len(sys.argv) == 6: 
     n_processors = sys.argv[1]
     n_steps = int(sys.argv[2]) #need try/catch?
     save_start = int(sys.argv[3])
     save_skip = int(sys.argv[4])
+    restore = str.lower(sys.argv[5])
+    #accept either true or false (not case sensitive) for resume_computaion; SystemExit for other input
+    if restore == 'true':
+        resume_computation = True
+    elif restore == 'false':
+        resume_computation = False
+    else: 
+        raise SystemExit("Input resume_compuation as 'True' or 'False'")
 #if no inputs are given, run with default 
 elif len(sys.argv) == 1:
     n_processors = '1'
     n_steps = 2000
     save_start = 1000
     save_skip = 1
+    resume_computation = False
 else: 
-    raise SystemExit("Usage: python3 aspect_geoid_mcmc.py n_processors n_steps save_start save_skip")
+    raise SystemExit("Usage: python3 aspect_geoid_mcmc.py n_processors n_steps save_start save_skip resume_computation")
     
 
 def setup_aspect_runs(run_dir='/dev/shm/geoidtmp/',base_input_file='boxslab_base.prm'):
@@ -75,6 +84,7 @@ def run_aspect(parameters,base_input_file = 'boxslab_base.prm',run_dir='./', tim
     try:
         subprocess.run(['mpirun', '-n', n_processors, aspect_command, prm_filename],cwd=run_dir, timeout=timeout)
     except subprocess.TimeoutExpired:
+        #add code to kill process
         print('\nProcess ran too long')
         return True
  
@@ -95,7 +105,7 @@ def calculate_geoid(output_folder,run_dir='./'):
     N_total = N_surface + N_interior + N_cmb
     return N_total
 
-def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_steps=10000,save_start=5000,save_skip=2,var=None):
+def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_steps=10000,save_start=5000,save_skip=2,var=None, resume_computation = False):
     # This function should implement the MCMC procedure
     # 1. Define the perturbations (proposal distributions) for each parameter
     #    and the bounds on each parameter. Define the total number of steps and
@@ -104,14 +114,50 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
     var_min = 1e-6
     var_max = 1e10
     var_change = 0.1
-    step_size = 0.1
+    step_size = 0.2
         
-    if var is None:
-        accepted_var = 1
-        allow_hierarchical = True   #variance can change 
+    
+    #unpickle results if resume_computation is true
+    if resume_computation == True:
+        with open('results.p', 'rb') as f:
+            saved_results = pickle.load(f)
+        
+        iter = saved_results['iteration']
+        if iter > save_start:
+            solution_archive = saved_results['parameters']
+            geoid_archive = saved_results['geoids']
+        else:
+            solution_archive = []
+            geoid_archive = []
+
+        starting_solution = deepcopy(solution_archive[-1])
+        ensemble_residual = saved_results['residuals'] 
+        var_archive = saved_results['variances'] 
+        accepted_var = var_archive[-1]
+        
+        if var is None:
+            allow_hierarchical = True
+        else:
+            allow_hierarchical = False
+        
+                
+    #otherwise begin with iteration 0 and empty archives
     else:
-        accepted_var = var
-        allow_hierarchical = False  #sigma prime = sigma
+        iter = 0
+        #create ensemble archive
+        ensemble_residual = []
+        solution_archive = []
+        geoid_archive = []
+        var_archive = []
+        
+        if var is None:
+            accepted_var = 1
+            allow_hierarchical = True   #variance can change 
+        else:
+            accepted_var = var
+            allow_hierarchical = False  #sigma prime = sigma
+            
+        
     accepted_solution = deepcopy(starting_solution)
     #initial perturbation / input starting_solution not used to produce observed_geoid
     # 2. For the initial guess, calculate the misfit and the likelihood.
@@ -123,14 +169,9 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
     accepted_magnitude = np.dot(accepted_residual, accepted_residual)
     #print(accepted_magnitude)
     
-    #create ensemble archive
-    ensemble_residual = []
-    solution_archive = []
-    geoid_archive = []
-    var_archive = []
 
-    # 3. Begin the MCMC procedure
-    iter = 0
+        # 3. Begin the MCMC procedure
+    
     while iter < n_steps:
         iter += 1
         success = False
@@ -276,4 +317,4 @@ results['bounds'] = parameter_bounds
 run_aspect(starter_parameters,'boxslab_base.prm')
 observed_geoid = calculate_geoid('boxslab_base')
 
-residual, solution_archive, var_archive, geoid_archive = MCMC(parameters, parameter_bounds, observed_geoid, n_steps, save_start, save_skip)
+residual, solution_archive, var_archive, geoid_archive = MCMC(parameters, parameter_bounds, observed_geoid, n_steps, save_start, save_skip, resume_computation = resume_computation)
