@@ -10,7 +10,7 @@ set Pressure normalization                  = surface
 set Surface pressure                       	= 0  
 set Adiabatic surface temperature 	 		= 273
 set Output directory 						= boxslab_base
-set Nonlinear solver scheme 				= no Advection, single Stokes
+set Nonlinear solver scheme 				= single Advection, iterated Stokes
 set World builder file 						= boxslab_topcrust.wb
 
 subsection Termination criteria
@@ -29,7 +29,7 @@ subsection Solver parameters
     set Composition solver tolerance = 1e-12
     set Temperature solver tolerance = 1e-12
     subsection Stokes solver parameters
-        set Linear solver tolerance = 1e-6
+#        set Linear solver tolerance = 1e-7
     end
 end
 
@@ -173,7 +173,7 @@ subsection Postprocess
   subsection Visualization
     set List of output variables      = density, viscosity, strain rate, dynamic topography, stress
     set Output format                 = hdf5
-    set Time between graphical output = 0.10e6
+    set Time between graphical output = 0.0
     set Number of grouped files       = 0
   end
 end 

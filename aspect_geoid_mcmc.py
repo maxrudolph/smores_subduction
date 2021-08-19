@@ -32,16 +32,16 @@ if len(sys.argv) == 6:
         raise SystemExit("Input resume_compuation as 'True' or 'False'")
 #if no inputs are given, run with default 
 elif len(sys.argv) == 1:
-    n_processors = '1'
-    n_steps = 500000
-    save_start = 00000
-    save_skip = 100
+    n_processors = '20'
+    n_steps = 5
+    save_start = 1
+    save_skip = 1
     resume_computation = False
 else: 
     raise SystemExit("Usage: python3 aspect_geoid_mcmc.py n_processors n_steps save_start save_skip resume_computation")
     
 
-def setup_aspect_runs(run_dir='/dev/shm/geoidtmp/',base_input_file='boxslab_base*.prm'):
+def setup_aspect_runs(run_dir='/dev/shm/geoidtmp/',base_input_file=['boxslab_base_start.prm','boxslab_base_resume.prm']):
     # make the run directory:
     try:
         run_dir = run_dir[:-1] + binascii.hexlify(os.urandom(8)).decode() + '/'
@@ -50,7 +50,8 @@ def setup_aspect_runs(run_dir='/dev/shm/geoidtmp/',base_input_file='boxslab_base
         print('run directory '+run_dir+' already exists or cannot be created')        
     # copy the aspect executable to the run directory
     subprocess.run(['cp', 'aspect.fast', run_dir])
-    subprocess.run(['cp',base_input_file,run_dir])
+    for file in base_input_file:
+        subprocess.run(['cp',file,run_dir])
     subprocess.run(['cp','boxslab_topcrust.wb',run_dir])
     
     # return the directory in which aspect has been placed.
@@ -63,7 +64,7 @@ def cleanup(run_dir=None):
         except:
             print('could not remove run directory',run_dir)
     
-def run_aspect(parameters,base_input_file = 'boxslab_base.prm',run_dir='./', timeout = None): 
+def run_aspect(parameters,base_input_file = 'boxslab_base.prm',run_dir='./', timeout = None,n_processors=n_processors): 
     
     #should remove previous output directory with same name
     #run as ls command before rm (be careful)
@@ -88,12 +89,12 @@ def run_aspect(parameters,base_input_file = 'boxslab_base.prm',run_dir='./', tim
         print('\nProcess ran too long')
         return True
  
-def calculate_geoid(output_folder,run_dir='./'):
+def calculate_geoid(output_folder,run_dir='./',step=0,mesh_step=0):
     # Do the geoid calculation
-    mesh_file = run_dir + output_folder + '/solution/mesh-00000.h5'
+    mesh_file = run_dir + output_folder + '/solution/mesh-{:05d}.h5'.format(mesh_step)
     #    print(mesh_file)
 
-    file0 = run_dir + output_folder + '/solution/solution-00000.h5'
+    file0 = run_dir + output_folder + '/solution/solution-{:05d}.h5'.format(step)
     cells,x,y,rho,topo = load_data(mesh_file,file0) 
     ind_surf,x_surf,ind_botm,x_botm = get_boundary_arrays(x,y)
     x_obs,y_obs = get_observation_vector(x,y,use_nodes=False)
@@ -105,7 +106,7 @@ def calculate_geoid(output_folder,run_dir='./'):
     N_total = N_surface + N_interior + N_cmb
     return N_total
 
-def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_steps=10000,save_start=5000,save_skip=2,var=None, resume_computation = False,sample_prior=False):
+def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_steps=10000,save_start=5000,save_skip=2,var=None, resume_computation = False,sample_prior=False,restart_interval=100):
     # This function should implement the MCMC procedure
     # 1. Define the perturbations (proposal distributions) for each parameter
     #    and the bounds on each parameter. Define the total number of steps and
@@ -169,8 +170,8 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
         accepted_magnitude = 0.;
     else:
         run_dir = setup_aspect_runs() # setup aspect to run in /dev/shm
-        run_aspect(accepted_solution,run_dir=run_dir)
-        accepted_geoid = calculate_geoid('boxslab_base',run_dir=run_dir)
+        run_aspect(accepted_solution,base_input_file='boxslab_base_start.prm',run_dir=run_dir)
+        accepted_geoid = calculate_geoid('boxslab_base',run_dir=run_dir,step=0,mesh_step=0)
         accepted_residual = accepted_geoid - observed_geoid
         accepted_magnitude = np.dot(accepted_residual, accepted_residual)
         #print(accepted_magnitude)
@@ -229,15 +230,20 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
             # if n_tries > some threshold, we are stuck in an infinite loop. print an error message and exit.
         # Calculate the forward model for the proposed solution
         if sample_prior is False:
-            timeout_check = run_aspect(proposed_solution, 'boxslab_base.prm', run_dir=run_dir, timeout=100) 
+            if iter % restart_interval == 0:
+                timeout_check = run_aspect(proposed_solution, 'boxslab_base_start.prm', run_dir=run_dir, timeout=300) 
+                # calculate the geoid from the aspect model.
+                proposed_geoid = calculate_geoid('boxslab_base', run_dir=run_dir,step=0,mesh_step=0)
+            else:
+                timeout_check = run_aspect(proposed_solution, 'boxslab_base_resume.prm', run_dir=run_dir, timeout=100) 
+                # calculate the geoid from the aspect model.
+                proposed_geoid = calculate_geoid('boxslab_base', run_dir=run_dir,step=1,mesh_step=1)
             print("step number" + str(iter))
             #if aspect timed out, continue without recalculating the geoid
             if(timeout_check == True):
                 iter -= 1 
                 continue
-    
-            # calculate the geoid from the aspect model.
-            proposed_geoid = calculate_geoid('boxslab_base', run_dir=run_dir)
+                
             # calculate the misfit
             proposed_residual = proposed_geoid - observed_geoid
             proposed_magnitude = np.dot(proposed_residual, proposed_residual)
@@ -255,7 +261,6 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
                 - 1/(2*proposed_var)*proposed_magnitude + 1/(2*accepted_var)*accepted_magnitude
 
         #print('log_alpha is:', log_alpha)
-
         proposed_likelihood = None
         # calculate the probability of acceptance using the Metropolis-Hastings Criterion
         if log_alpha > 0 or log_alpha > np.log(np.random.rand()):
@@ -333,4 +338,4 @@ results['bounds'] = parameter_bounds
 #observed_geoid = calculate_geoid('boxslab_base')
 observed_geoid = np.zeros((100,1))
 
-residual, solution_archive, var_archive, geoid_archive = MCMC(parameters, parameter_bounds, observed_geoid, n_steps, save_start, save_skip, resume_computation = resume_computation,sample_prior=True)
+residual, solution_archive, var_archive, geoid_archive = MCMC(parameters, parameter_bounds, observed_geoid, n_steps, save_start, save_skip, resume_computation = resume_computation,sample_prior=False)
