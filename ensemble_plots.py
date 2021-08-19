@@ -14,8 +14,8 @@ with open('results.p', 'rb') as f:
     results = pickle.load(f)
     
 residuals = results['residuals']
-solution_archive = results['parameters']
-geoid_archive = results['geoids']
+solution_archive = results['parameters'][-5000:]
+geoid_archive = results['geoids'][-5000:]
 variances = results['variances'] 
 starter_parameters = results['starter_parameters'] 
 parameter_bounds = results['bounds'] 
@@ -39,25 +39,27 @@ plt.show()
 plt.close()
 
 
-#Plot to show probability distribution for pertubation
-key = 'PREFACTOR0'
-sigma = 0.05
-mu = np.log10(2e-15)
-plt.axvline(mu, color = 'r', linewidth = 1)
-bounds = np.log10(parameter_bounds['PREFACTOR0'])
-x = np.linspace(bounds[0], bounds[1], 1000)
-y = 1/(sigma*np.sqrt(2*np.pi)) * np.exp(-0.5*((x-mu)/sigma)**2 )
-plt.plot(x, stats.norm.pdf(x, np.log10(2e-15), 0.05))
-plt.xlabel('log(PREFACTOR0)')
-plt.ylabel('likelihood')
-plt.title('Probability Distribution for Change in PREFACTOR0')
-plt.show()
+# #Plot to show probability distribution for pertubation
+# key = 'PREFACTOR0'
+# sigma = 0.05
+# mu = np.log10(2e-15)
+# plt.axvline(mu, color = 'r', linewidth = 1)
+# bounds = np.log10(parameter_bounds['PREFACTOR0'])
+# x = np.linspace(bounds[0], bounds[1], 1000)
+# y = 1/(sigma*np.sqrt(2*np.pi)) * np.exp(-0.5*((x-mu)/sigma)**2 )
+# plt.plot(x, stats.norm.pdf(x, np.log10(2e-15), 0.05))
+# plt.xlabel('log(PREFACTOR0)')
+# plt.ylabel('likelihood')
+# plt.title('Probability Distribution for Change in PREFACTOR0')
+# plt.show()
 
 #plot ensemble parameter values
+labels = ['A0', 'A1', 'A2', 'B0', 'B1', 'B2']
 parameter_count = len(starter_parameters)
 fig, axs = plt.subplots(nrows=2,ncols=3, constrained_layout=True, figsize=(8,5), sharey = True)
 for j in range(parameter_count):
     key = list(starter_parameters.keys())[j]
+    title = labels[j]
     if j<parameter_count/2:
         i = 0
     else:
@@ -66,7 +68,7 @@ for j in range(parameter_count):
     axs[i][j].hist(np.log10([p[key] for p in solution_archive]), bins=100, range=np.log10(parameter_bounds[key]))
     #add vertical line for starter parameter values
     axs[i][j].axvline(np.log10(starter_parameters[key]), color='r', linewidth = 1)
-    axs[i][j].set_title(key)
+    axs[i][j].set_title(labels[j])
     axs[i][j].set_xlabel('log(prefactor value)')
     axs[i][0].set_ylabel('count')
 plt.suptitle('Ensemble Solutions')
