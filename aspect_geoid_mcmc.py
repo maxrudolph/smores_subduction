@@ -34,7 +34,7 @@ if len(sys.argv) == 6:
 elif len(sys.argv) == 1:
     n_processors = '1'
     n_steps = 2000
-    save_start = 1000
+    save_start = 0
     save_skip = 1
     resume_computation = False
 else: 
@@ -114,7 +114,7 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
     var_min = 1e-6
     var_max = 1e10
     var_change = 0.1
-    step_size = 0.2
+    step_size = 0.05
         
     
     #unpickle results if resume_computation is true
@@ -167,6 +167,7 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
     accepted_geoid = calculate_geoid('boxslab_base',run_dir=run_dir)
     accepted_residual = accepted_geoid - observed_geoid
     accepted_magnitude = np.dot(accepted_residual, accepted_residual)
+    #this is the magnitude squared? but
     #print(accepted_magnitude)
     
 
@@ -239,7 +240,7 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
         log_alpha = N/2*((np.log(accepted_var)) - np.log(proposed_var)) \
             - 1/(2*proposed_var)*proposed_magnitude + 1/(2*accepted_var)*accepted_magnitude
 
-        #print('log_alpha is:', log_alpha)
+        print('log_alpha is:', log_alpha)
 
         proposed_likelihood = None
         # calculate the probability of acceptance using the Metropolis-Hastings Criterion
