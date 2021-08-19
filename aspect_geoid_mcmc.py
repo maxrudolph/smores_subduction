@@ -41,7 +41,7 @@ else:
     raise SystemExit("Usage: python3 aspect_geoid_mcmc.py n_processors n_steps save_start save_skip resume_computation")
     
 
-def setup_aspect_runs(run_dir='/dev/shm/geoidtmp/',base_input_file='boxslab_base.prm'):
+def setup_aspect_runs(run_dir='/dev/shm/geoidtmp/',base_input_file='boxslab_base*.prm'):
     # make the run directory:
     try:
         run_dir = run_dir[:-1] + binascii.hexlify(os.urandom(8)).decode() + '/'
