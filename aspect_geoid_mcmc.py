@@ -336,6 +336,11 @@ results['bounds'] = parameter_bounds
 #create starter.prm from starter_parameters
 #run_aspect(starter_parameters,'boxslab_base.prm')
 #observed_geoid = calculate_geoid('boxslab_base')
-observed_geoid = np.zeros((100,1))
+sample_prior = False
+if sample_prior is True:
+    observed_geoid = np.zeros((101,))
+else:
+    run_aspect(starter_parameters,'boxslab_base_start.prm')
+    observed_geoid = calculate_geoid('boxslab_base',step=0,mesh_step=0)
 
-residual, solution_archive, var_archive, geoid_archive = MCMC(parameters, parameter_bounds, observed_geoid, n_steps, save_start, save_skip, resume_computation = resume_computation,sample_prior=False)
+residual, solution_archive, var_archive, geoid_archive = MCMC(starter_parameters, parameter_bounds, observed_geoid, n_steps, save_start, save_skip, resume_computation = resume_computation,sample_prior=sample_prior)
