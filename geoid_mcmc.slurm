@@ -10,5 +10,5 @@
 module load python3/3.8.2
 module load openmpi/4.0.5-mpi-io
 source /home/rudolph/python3-venv/bin/activate
-time python3 aspect_geoid_mcmc.py 1000 500 2 false
+time python3 aspect_geoid_mcmc.py 32 50000 40000 1 false
 
