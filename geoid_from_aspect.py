@@ -22,10 +22,14 @@ from geoid_functions import *
 #%% parse command-linne arguments
 # usage of this program: ./groid_from_aspect.py solution_foldergraphics_name
 # graphics_name is the filename for graphics, not including the file extension (.svg)
-if len(sys.argv) < 3: 
-    raise SystemExit("Usage: ./geoid_from_aspect.py output_directory graphics_name")
-output_folder = sys.argv[1]
-graphics_file = sys.argv[2]
+if len(sys.argv) == 1:
+    output_folder = 'starter'
+
+elif len(sys.argv) == 3: 
+    output_folder = sys.argv[1]
+    graphics_file = sys.argv[2]
+else: 
+     raise SystemExit("Usage: ./geoid_from_aspect.py output_directory graphics_name")
     
 #%% Do the geoid calculation
 mesh_file = output_folder+'/solution/mesh-00000.h5'

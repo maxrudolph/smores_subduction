@@ -125,7 +125,7 @@ subsection Material model
 end
 
 subsection Mesh refinement
-  set Initial global refinement = 4
+  set Initial global refinement = 5
   set Minimum refinement level  = 4
   set Initial adaptive refinement = 3 #5
   set Strategy = viscosity, density, minimum refinement function, maximum refinement function
