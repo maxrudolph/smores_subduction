@@ -175,9 +175,7 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
         accepted_geoid = calculate_geoid('boxslab_base',run_dir=run_dir,step=0,mesh_step=0)
         accepted_residual = accepted_geoid - observed_geoid
         accepted_magnitude = np.dot(accepted_residual, accepted_residual)
-        #print(accepted_magnitude)
-
-    
+        #print(accepted_magnitude)    
 
         # 3. Begin the MCMC procedure
     
@@ -262,7 +260,8 @@ def MCMC(starting_solution=None, parameter_bounds=None, observed_geoid=None, n_s
             log_alpha = N/2*((np.log(accepted_var)) - np.log(proposed_var)) \
                 - 1/(2*proposed_var)*proposed_magnitude + 1/(2*accepted_var)*accepted_magnitude
 
-        print('log_alpha is:', log_alpha)
+
+        #print('log_alpha is:', log_alpha)
 
         proposed_likelihood = None
         # calculate the probability of acceptance using the Metropolis-Hastings Criterion
